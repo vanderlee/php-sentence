@@ -30,7 +30,7 @@ class Sentence {
 	 * @return array
 	 */
 	private static function linebreak_split($text) {
-		return mb_split('\R', $text);
+		return mb_split('\r\n|\r|\n', $text);
 	}
 
 	/**
@@ -47,26 +47,26 @@ class Sentence {
 	 * @param array $lines
 	 * @return array
 	 */
-	private function punctuation_split($lines) {										
+	private function punctuation_split($line) {										
 		$parts = array();
-		foreach ($lines as $line) {
-			if (!empty($line)) {
-				$chars = preg_split('//u', $line, -1, PREG_SPLIT_NO_EMPTY);	// This is UTF8 multibyte safe!
+
+		$chars = preg_split('//u', $line, -1, PREG_SPLIT_NO_EMPTY);	// This is UTF8 multibyte safe!
+		$is_terminal = in_array($chars[0], $this->terminals);
+		
+		$part = '';
+		foreach ($chars as $char) {
+			if (in_array($char, $this->terminals) !== $is_terminal) {
+				$parts[] = $part;
 				$part = '';
-				$is_terminal = in_array($chars[0], $this->terminals);
-				foreach ($chars as $char) {
-					if (in_array($char, $this->terminals) !== $is_terminal) {
-						$parts[] = $part;
-						$part = '';
-						$is_terminal = !$is_terminal;
-					}
-					$part .= $char;							
-				}
-				if (!empty($part)) {
-					$parts[] = $part;							
-				}
+				$is_terminal = !$is_terminal;
 			}
+			$part .= $char;							
 		}
+		
+		if (!empty($part)) {
+			$parts[] = $part;							
+		}
+
 		return $parts;
 	}
 
@@ -173,11 +173,18 @@ class Sentence {
 	}
 
 	public function split($text) {		
-		$linebreaks		= self::linebreak_split($text);
-		$punctuations	= $this->punctuation_split($linebreaks);
-		$merge			= $this->punctuation_merge($punctuations);
-		$shorts			= $this->abbreviation_merge($merge);
-		$sentences		= $this->sentence_merge($shorts);
+		$sentences = array();
+		
+		foreach (self::linebreak_split($text) as $line) {	
+			$line = self::mb_trim($line);
+			if (!empty($line)) {
+				$punctuations	= $this->punctuation_split($line);
+				$merge			= $this->punctuation_merge($punctuations);
+				$shorts			= $this->abbreviation_merge($merge);
+				$sentences		= array_merge($sentences, $this->sentence_merge($shorts));
+			}
+		}
+var_dump($sentences);		
 
 		return $sentences;
 	}

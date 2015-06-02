@@ -10,7 +10,10 @@
  * latin-alphabet languages.
  */
 class Sentence {
-	private $terminals = array('.', '!', '?');
+	const SPLIT_TRIM		= 0x1;
+	
+	private $terminals		= array('.', '!', '?');
+	private $abbreviators	= array('.');
 
 	/**
 	 * Multibyte safe version of standard trim() function.
@@ -54,7 +57,7 @@ class Sentence {
 		$is_terminal = in_array($chars[0], $this->terminals);
 		
 		$part = '';
-		foreach ($chars as $char) {
+		foreach ($chars as $index => $char) {
 			if (in_array($char, $this->terminals) !== $is_terminal) {
 				$parts[] = $part;
 				$part = '';
@@ -118,20 +121,27 @@ class Sentence {
 	 * @return array
 	 */
 	private function abbreviation_merge($fragments) {
+		$non_abbreviating_terminals = array_diff($this->terminals, $this->abbreviators);
+		
 		$abbreviations = array();
+		
 		$abbreviation = '';
-
-		$prevwordcount = null;
+		
+		$previous_word_count = null;
+		$previous_word_ending = null;		
 		foreach ($fragments as $fragment) {
-			$wordcount = count(mb_split('\s+', self::mb_trim($fragment)));
-
-			if ($prevwordcount !== null && ($prevwordcount !== 1 || $wordcount !== 1)) {
+			$word_count = count(mb_split('\s+', self::mb_trim($fragment)));
+			$starts_with_space = mb_ereg_match('^\s+', $fragment);			
+			$after_non_abbreviating_terminal = in_array($previous_word_ending, $non_abbreviating_terminals);
+			
+			if ($after_non_abbreviating_terminal || ($previous_word_count !== null && ($previous_word_count !== 1 || $word_count !== 1) && $starts_with_space)) {
 				$abbreviations[] = $abbreviation;
 				$abbreviation = '';
 			}
 
-			$abbreviation.= $fragment;					
-			$prevwordcount = $wordcount;							
+			$abbreviation			.= $fragment;					
+			$previous_word_count	= $word_count;							
+			$previous_word_ending	= mb_substr($fragment, -1);			
 		}
 		if ($abbreviation !== '') {
 			$abbreviations[] = $abbreviation;
@@ -149,21 +159,27 @@ class Sentence {
 	 * @return array
 	 */
 	private function sentence_merge($shorts) {
+		$non_abbreviating_terminals = array_diff($this->terminals, $this->abbreviators);
+
 		$sentences = array();
 
 		$sentence = '';					
 		$has_words = false;
+		$previous_word_ending = null;
 		foreach ($shorts as $short) {
-			$wordcount = count(mb_split('\s+', self::mb_trim($short)));
-
-			if ($has_words && $wordcount > 1) {
+			$word_count = count(mb_split('\s+', self::mb_trim($short)));			
+			$after_non_abbreviating_terminal = in_array($previous_word_ending, $non_abbreviating_terminals);
+			
+			if ($after_non_abbreviating_terminal || ($has_words && $word_count > 1)) {
 				$sentences[] = $sentence;
 				$sentence = '';						
-				$has_words = $wordcount > 1;
+				$has_words = $word_count > 1;
 			} else {
-				$has_words = $has_words || $wordcount > 1;						
+				$has_words = $has_words || $word_count > 1;						
 			}
-			$sentence.= $short;
+			
+			$sentence.= $short;			
+			$previous_word_ending = mb_substr($short, -1);					
 		}
 		if (!empty($sentence)) {
 			$sentences[] = $sentence;
@@ -172,19 +188,26 @@ class Sentence {
 		return $sentences;
 	}
 
-	public function split($text) {		
+	public function split($text, $flags = 0) {		
 		$sentences = array();
-		
-		foreach (self::linebreak_split($text) as $line) {	
-			$line = self::mb_trim($line);
-			if (!empty($line)) {
+
+		// Split
+		foreach (self::linebreak_split($text) as $line) {				
+			if (self::mb_trim($line) !== '') {
 				$punctuations	= $this->punctuation_split($line);
 				$merge			= $this->punctuation_merge($punctuations);
 				$shorts			= $this->abbreviation_merge($merge);
 				$sentences		= array_merge($sentences, $this->sentence_merge($shorts));
 			}
 		}
-var_dump($sentences);		
+		
+		// Post process
+		if ($flags & self::SPLIT_TRIM) {
+			foreach ($sentences as &$sentence) {
+				$sentence = self::mb_trim($sentence);
+			}
+			unset($sentence);
+		}
 
 		return $sentences;
 	}

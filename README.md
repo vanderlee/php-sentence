@@ -1,5 +1,7 @@
 Sentence
 ========
+[![Build Status](https://travis-ci.org/vanderlee/phpSentence.svg?branch=master)](https://travis-ci.org/vanderlee/phpSentence)
+
 Version 0.2
 
 Copyright &copy; 2015 Martijn van der Lee.

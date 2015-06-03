@@ -33,7 +33,7 @@ class Sentence {
 	 * @return array
 	 */
 	private static function linebreak_split($text) {
-		return mb_split('\r\n|\r|\n', $text);
+		return mb_split('(?=\r\n|\r|\n)|(<=\r\n|\r|\n)', $text);
 	}
 
 	/**

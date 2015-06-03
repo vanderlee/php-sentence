@@ -147,14 +147,13 @@ class SentenceTest extends PHPUnit_Framework_TestCase {
 	 * @covers Sentence::split
 	 */
 	public function testSplitLinebreaks() {
-		$this->markTestIncomplete('This test has not been implemented yet.');				
-//		$this->assertSame(array('Hello world...', '\rAre you there?'), $this->object->split("Hello world...\rAre you there?"));
-//		$this->assertSame(array('Hello world...', '\nAre you there?'), $this->object->split("Hello world...\nAre you there?"));
-//		$this->assertSame(array('Hello world...', '\r\nAre you there?'), $this->object->split("Hello world...\r\nAre you there?"));
-//		$this->assertSame(array('Hello world...', '\r\n\rAre you there?'), $this->object->split("Hello world...\r\n\rAre you there?"));
-//		$this->assertSame(array('Hello world...', '\n\r\nAre you there?'), $this->object->split("Hello world...\n\r\nAre you there?"));
-//		$this->assertSame(array('Hello world...', '\n\nAre you there?'), $this->object->split("Hello world...\n\nAre you there?"));
-//		$this->assertSame(array('Hello world...', '\r\rAre you there?'), $this->object->split("Hello world...\r\rAre you there?"));
+		$this->assertSame(array('Hello world...', "\rAre you there?"), $this->object->split("Hello world...\rAre you there?"));
+		$this->assertSame(array('Hello world...', "\nAre you there?"), $this->object->split("Hello world...\nAre you there?"));
+		$this->assertSame(array('Hello world...', "\r\nAre you there?"), $this->object->split("Hello world...\r\nAre you there?"));
+		$this->assertSame(array('Hello world...', "\r\n\rAre you there?"), $this->object->split("Hello world...\r\n\rAre you there?"));
+		$this->assertSame(array('Hello world...', "\n\r\nAre you there?"), $this->object->split("Hello world...\n\r\nAre you there?"));
+		$this->assertSame(array('Hello world...', "\n\nAre you there?"), $this->object->split("Hello world...\n\nAre you there?"));
+		$this->assertSame(array('Hello world...', "\r\rAre you there?"), $this->object->split("Hello world...\r\rAre you there?"));
 	}
 
 	/**

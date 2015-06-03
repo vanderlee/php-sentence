@@ -2,7 +2,7 @@ Sentence
 ========
 [![Build Status](https://travis-ci.org/vanderlee/phpSentence.svg)](https://travis-ci.org/vanderlee/phpSentence)
 
-Version 0.2
+Version 0.3
 
 Copyright &copy; 2015 Martijn van der Lee.
 MIT Open Source license applies.
@@ -70,3 +70,18 @@ sentence count except in very uncommon situations.
 
 It should be noted that this algorithm depends on reasonably gramatically
 correct punctuation. Do not L33t-5p3ak!!!!!1!1!11!eleven!!
+
+Rules
+=====
+-	Each linebreak separates sentences.
+-	The end of the text indicates the end if a sentence if not otherwise ended
+	through proper punctuation.
+-	Sentences must be atleast two words long, unless a linebreak or end-of-text.
+-	An empty line is not a sentence.
+-	Each question- or exclaimation mark or combination thereof, is considered
+	the end of a sentence.
+-	A single period is considered the end of a sentence, unless...
+	-	It is preceded by one word, or...
+	-	It is followed by one word.
+-	A sequence of multiple periods is not considered the end of a sentence.
+		

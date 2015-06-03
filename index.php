@@ -12,7 +12,7 @@
 			// This is the test text we're going to use
 			$text	= "Hello there, Mr. Smith. What're you doing today... Smith,"
 					. " my friend?\n\nI hope it's good. This last sentence will"
-					. " cost you $2.50! Just kidding :)";			
+					. " cost you $2.50! Just kidding :)";
 			
 			// Create a new instance
 			$Sentence	= new Sentence;

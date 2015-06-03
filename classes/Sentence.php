@@ -87,7 +87,9 @@ class Sentence {
 	 * @param array $punctuations
 	 * @return array
 	 */
-	private function punctuation_merge($punctuations) {
+	private function punctuation_merge($punctuations) {		
+		$definite_terminals = array_diff($this->terminals, $this->abbreviators);
+		
 		$merges = array();
 		$merge = '';
 
@@ -97,6 +99,14 @@ class Sentence {
 				if (mb_strlen($punctuation) === 1 && in_array($punctuation, $this->terminals)) {
 					$merges[] = $merge;
 					$merge = '';
+				} else {
+					foreach ($definite_terminals as $terminal) {
+						if (mb_strpos($punctuation, $terminal) !== false) {
+							$merges[] = $merge;
+							$merge = '';
+							break;
+						}
+					}
 				}
 			}			
 		}
@@ -195,8 +205,8 @@ class Sentence {
 		foreach (self::linebreak_split($text) as $line) {				
 			if (self::mb_trim($line) !== '') {
 				$punctuations	= $this->punctuation_split($line);
-				$merge			= $this->punctuation_merge($punctuations);
-				$shorts			= $this->abbreviation_merge($merge);
+				$merges			= $this->punctuation_merge($punctuations);
+				$shorts			= $this->abbreviation_merge($merges);
 				$sentences		= array_merge($sentences, $this->sentence_merge($shorts));
 			}
 		}

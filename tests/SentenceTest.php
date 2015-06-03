@@ -88,6 +88,18 @@ class SentenceTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @covers Sentence::count
 	 */
+	public function testCountMultiplePunctuation() {
+		$this->assertSame(2, $this->object->count("Hello there. Brave new world."));
+		$this->assertSame(1, $this->object->count("Hello there... Brave new world."));
+		$this->assertSame(2, $this->object->count("Hello there?... Brave new world."));
+		$this->assertSame(2, $this->object->count("Hello there!... Brave new world."));
+		$this->assertSame(2, $this->object->count("Hello there!!! Brave new world."));
+		$this->assertSame(2, $this->object->count("Hello there??? Brave new world."));
+	}
+	
+	/**
+	 * @covers Sentence::count
+	 */
 	public function testCountOneWordSentences() {	
 		$this->assertSame(2, $this->object->count("You? Smith?"));
 		$this->assertSame(2, $this->object->count("You there? Smith?"));

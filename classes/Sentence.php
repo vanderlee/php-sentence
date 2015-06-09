@@ -20,7 +20,7 @@ class Sentence {
 	 * @param string $string
 	 * @return string
 	 */
-	private static function mb_trim($string) {
+	private static function mbTrim($string) {
 		return mb_ereg_replace('^\s*([\s\S]*?)\s*$', '\1', $string);
 	}
 
@@ -33,7 +33,7 @@ class Sentence {
 	 * @param int $flags
 	 * @return array
 	 */
-	private static function mb_explode($pattern, $string, $limit = -1, $flags = 0) {		
+	private static function mbSplit($pattern, $string, $limit = -1, $flags = 0) {		
 		$strlen = strlen($string);		// bytes!	
 		mb_ereg_search_init($string);
 		
@@ -96,13 +96,13 @@ class Sentence {
 	 * @param string $text
 	 * @return array
 	 */
-	private static function linebreak_split($text) {
+	private static function linebreakSplit($text) {
 		$lines = array();
 		$line = '';
 		
-		foreach (self::mb_explode('([\r\n]+)', $text, -1, PREG_SPLIT_DELIM_CAPTURE) as $part) {
+		foreach (self::mbSplit('([\r\n]+)', $text, -1, PREG_SPLIT_DELIM_CAPTURE) as $part) {
 			$line .= $part;
-			if (self::mb_trim($part) === '') {
+			if (self::mbTrim($part) === '') {
 				$lines[] = $line;
 				$line = '';
 			}
@@ -126,7 +126,7 @@ class Sentence {
 	 * @param array $lines
 	 * @return array
 	 */
-	private function punctuation_split($line) {										
+	private function punctuationSplit($line) {										
 		$parts = array();
 
 		$chars = preg_split('//u', $line, -1, PREG_SPLIT_NO_EMPTY);	// This is UTF8 multibyte safe!
@@ -163,7 +163,7 @@ class Sentence {
 	 * @param array $punctuations
 	 * @return array
 	 */
-	private function punctuation_merge($punctuations) {		
+	private function punctuationMerge($punctuations) {		
 		$definite_terminals = array_diff($this->terminals, $this->abbreviators);
 		
 		$merges = array();
@@ -206,7 +206,7 @@ class Sentence {
 	 * @param array $fragments
 	 * @return array
 	 */
-	private function abbreviation_merge($fragments) {
+	private function abbreviationMerge($fragments) {
 		$non_abbreviating_terminals = array_diff($this->terminals, $this->abbreviators);
 		
 		$abbreviations = array();
@@ -216,7 +216,7 @@ class Sentence {
 		$previous_word_count = null;
 		$previous_word_ending = null;		
 		foreach ($fragments as $fragment) {
-			$word_count = count(mb_split('\s+', self::mb_trim($fragment)));
+			$word_count = count(mb_split('\s+', self::mbTrim($fragment)));
 			$starts_with_space = mb_ereg_match('^\s+', $fragment);			
 			$after_non_abbreviating_terminal = in_array($previous_word_ending, $non_abbreviating_terminals);
 			
@@ -244,7 +244,7 @@ class Sentence {
 	 * @param array $shorts
 	 * @return array
 	 */
-	private function sentence_merge($shorts) {
+	private function sentenceMerge($shorts) {
 		$non_abbreviating_terminals = array_diff($this->terminals, $this->abbreviators);
 
 		$sentences = array();
@@ -253,7 +253,7 @@ class Sentence {
 		$has_words = false;
 		$previous_word_ending = null;
 		foreach ($shorts as $short) {
-			$word_count = count(mb_split('\s+', self::mb_trim($short)));			
+			$word_count = count(mb_split('\s+', self::mbTrim($short)));			
 			$after_non_abbreviating_terminal = in_array($previous_word_ending, $non_abbreviating_terminals);
 			
 			if ($after_non_abbreviating_terminal || ($has_words && $word_count > 1)) {
@@ -278,19 +278,19 @@ class Sentence {
 		$sentences = array();
 
 		// Split
-		foreach (self::linebreak_split($text) as $line) {				
-			if (self::mb_trim($line) !== '') {
-				$punctuations	= $this->punctuation_split($line);
-				$merges			= $this->punctuation_merge($punctuations);
-				$shorts			= $this->abbreviation_merge($merges);
-				$sentences		= array_merge($sentences, $this->sentence_merge($shorts));
+		foreach (self::linebreakSplit($text) as $line) {				
+			if (self::mbTrim($line) !== '') {
+				$punctuations	= $this->punctuationSplit($line);
+				$merges			= $this->punctuationMerge($punctuations);
+				$shorts			= $this->abbreviationMerge($merges);
+				$sentences		= array_merge($sentences, $this->sentenceMerge($shorts));
 			}
 		}
 		
 		// Post process
 		if ($flags & self::SPLIT_TRIM) {
 			foreach ($sentences as &$sentence) {
-				$sentence = self::mb_trim($sentence);
+				$sentence = self::mbTrim($sentence);
 			}
 			unset($sentence);
 		}

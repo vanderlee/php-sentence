@@ -2,7 +2,7 @@ Sentence
 ========
 [![Build Status](https://travis-ci.org/vanderlee/phpSentence.svg)](https://travis-ci.org/vanderlee/phpSentence)
 
-Version 0.4
+Version 1.0
 
 Copyright &copy; 2015 Martijn van der Lee.
 MIT Open Source license applies.

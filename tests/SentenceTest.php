@@ -147,13 +147,14 @@ class SentenceTest extends PHPUnit_Framework_TestCase {
 	 * @covers Sentence::split
 	 */
 	public function testSplitLinebreaks() {
-		$this->assertSame(array('Hello world...', "\rAre you there?"), $this->object->split("Hello world...\rAre you there?"));
-		$this->assertSame(array('Hello world...', "\nAre you there?"), $this->object->split("Hello world...\nAre you there?"));
-		$this->assertSame(array('Hello world...', "\r\nAre you there?"), $this->object->split("Hello world...\r\nAre you there?"));
-		$this->assertSame(array('Hello world...', "\r\n\rAre you there?"), $this->object->split("Hello world...\r\n\rAre you there?"));
-		$this->assertSame(array('Hello world...', "\n\r\nAre you there?"), $this->object->split("Hello world...\n\r\nAre you there?"));
-		$this->assertSame(array('Hello world...', "\n\nAre you there?"), $this->object->split("Hello world...\n\nAre you there?"));
-		$this->assertSame(array('Hello world...', "\r\rAre you there?"), $this->object->split("Hello world...\r\rAre you there?"));
+		$this->assertSame(array("Hello world...\r", "Are you there?"), $this->object->split("Hello world...\rAre you there?"));
+		$this->assertSame(array("Hello world...\n", " Are you there?"), $this->object->split("Hello world...\n Are you there?"));
+		$this->assertSame(array("Hello world...\n", "Are you there?"), $this->object->split("Hello world...\nAre you there?"));
+		$this->assertSame(array("Hello world...\r\n", "Are you there?"), $this->object->split("Hello world...\r\nAre you there?"));
+		$this->assertSame(array("Hello world...\r\n\r", "Are you there?"), $this->object->split("Hello world...\r\n\rAre you there?"));
+		$this->assertSame(array("Hello world...\n\r\n", "Are you there?"), $this->object->split("Hello world...\n\r\nAre you there?"));
+		$this->assertSame(array("Hello world...\n\n", "Are you there?"), $this->object->split("Hello world...\n\nAre you there?"));
+		$this->assertSame(array("Hello world...\r\r", "Are you there?"), $this->object->split("Hello world...\r\rAre you there?"));
 	}
 
 	/**

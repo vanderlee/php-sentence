@@ -1,6 +1,6 @@
 Sentence
 ========
-[![Build Status](https://travis-ci.org/vanderlee/phpSentence.svg)](https://travis-ci.org/vanderlee/phpSentence)
+[![Build Status](https://travis-ci.org/vanderlee/php-sentence.svg)](https://travis-ci.org/vanderlee/php-sentence)
 
 Version 1.0
 

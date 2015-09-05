@@ -10,9 +10,21 @@
  * latin-alphabet languages.
  */
 class Sentence {
+	/**
+	 * Specify this flag with the split method to trim whitespace.
+	 */
 	const SPLIT_TRIM		= 0x1;
-	
+
+	/**
+	 * List of characters used to terminate sentences.
+	 * @var array
+	 */
 	private $terminals		= array('.', '!', '?');
+
+	/**
+	 * List of characters used for abbreviations.
+	 * @var array
+	 */
 	private $abbreviators	= array('.');
 
 	/**
@@ -274,6 +286,13 @@ class Sentence {
 		return $sentences;
 	}
 
+	/**
+	 * Return the sentences sentences detected in the provided text.
+	 * Set the Sentence::SPLIT_TRIM flag to trim whitespace.
+	 * @param string $text
+	 * @param integer $flags
+	 * @return array
+	 */
 	public function split($text, $flags = 0) {		
 		$sentences = array();
 
@@ -297,7 +316,12 @@ class Sentence {
 
 		return $sentences;
 	}
-	
+
+	/**
+	 * Return the number of sentences detected in the provided text.
+	 * @param string $text
+	 * @return integer
+	 */
 	public function count($text) {
 		return count($this->split($text));
 	}

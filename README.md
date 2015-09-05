@@ -32,6 +32,10 @@ Splits the text into sentences.
 -	**`Sentence::SPLIT_TRIM`**: Trim whitespace off the left and right sides of
 	each returned sentence.
 
+Documentation
+-------------
+You can find documentation generated from the source code by ApiGen here: [ApiGen documentation](doc/)
+
 Examples
 ========
 	<?php
@@ -42,13 +46,13 @@ Examples
 		// This is the test text we're going to use
 		$text	= "Hello there, Mr. Smith. What're you doing today... Smith,"
 				. " my friend?\n\nI hope it's good. This last sentence will"
-				. " cost you $2.50! Just kidding :)";			
+				. " cost you $2.50! Just kidding :)";
 
 		// Create a new instance
 		$Sentence	= new Sentence;
 
-		// Split into array of sentences			
-		$sentences	= $Sentence->split($text);			
+		// Split into array of sentences
+		$sentences	= $Sentence->split($text);
 
 		// Count the number of sentences
 		$count		= $Sentence->count($text);
@@ -72,13 +76,15 @@ It should be noted that this algorithm depends on reasonably gramatically
 correct punctuation. Do not L33t-5p3ak!!!!!1!1!11!eleven!!
 
 Rules
-=====
+-----
+The following is a rough list of the rules used to split sentences.
+
 -	Each linebreak separates sentences.
 -	The end of the text indicates the end if a sentence if not otherwise ended
 	through proper punctuation.
--	Sentences must be atleast two words long, unless a linebreak or end-of-text.
+-	Sentences must be at least two words long, unless a linebreak or end-of-text.
 -	An empty line is not a sentence.
--	Each question- or exclaimation mark or combination thereof, is considered
+-	Each question- or exclamation mark or combination thereof, is considered
 	the end of a sentence.
 -	A single period is considered the end of a sentence, unless...
 	-	It is preceded by one word, or...

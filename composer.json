@@ -1,0 +1,20 @@
+{
+    "name": "vanderlee/phpSentence",
+    "description": "Simple text sentence splitting and counting. Supports atleast english, german and dutch, possibly more.",
+        "type": "library",
+    "keywords": ["sentence", "split", "count", "boundary", "disambiguation", "segmentation"],
+    "homepage": "https://github.com/vanderlee/phpSentence.git",
+    "license": "MIT",
+        "support": {
+                "issues": "https://github.com/vanderlee/phpSentence/issues",
+                "source": "https://github.com/vanderlee/phpSentence"
+        },
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "classmap": [
+			"classes/"
+		]
+    }
+}

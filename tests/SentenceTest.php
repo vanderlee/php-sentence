@@ -104,7 +104,7 @@ class SentenceTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(2, $this->object->count("You? Smith?"));
 		$this->assertSame(2, $this->object->count("You there? Smith?"));
 		$this->assertSame(1, $this->object->count("You mr. Smith?"));
-		//$this->assertSame(2, $this->object->count("Are you there. Smith?");	// Confuses "there." for an abbreviation.
+		$this->assertSame(2, $this->object->count("Are you there. Mister Smith?"));
 		$this->assertSame(2, $this->object->count("Are you there. Smith, sir?"));
 		$this->assertSame(2, $this->object->count("Are you there. Mr. Smith?"));
 	}
@@ -175,7 +175,7 @@ class SentenceTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame(array("You?", " Smith?"), $this->object->split("You? Smith?"));
 		$this->assertSame(array("You there?", " Smith?"), $this->object->split("You there? Smith?"));
 		$this->assertSame(array("You mr. Smith?"), $this->object->split("You mr. Smith?"));
-		//$this->assertSame(2, $this->object->count("Are you there. Smith?");	// Confuses "there." for an abbreviation.
+		$this->assertSame(array("Are you there.", " Mister Smith?"), $this->object->split("Are you there. Mister Smith?"));
 		$this->assertSame(array("Are you there.", " Smith, sir?"), $this->object->split("Are you there. Smith, sir?"));
 		$this->assertSame(array("Are you there.", " Mr. Smith?"), $this->object->split("Are you there. Mr. Smith?"));
 	}

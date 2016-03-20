@@ -4,7 +4,7 @@
 	 * Splits up text into sentences.
 	 *
 	 * @author Martijn W. van der Lee <martijn-at-vanderlee-dot-com>
-	 * @copyright Copyright (c) 2015, Martijn W. van der Lee
+	 * @copyright Copyright (c) 2016, Martijn W. van der Lee
 	 * @license http://www.opensource.org/licenses/mit-license.php
 	 */
 

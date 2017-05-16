@@ -250,6 +250,43 @@ class Sentence
 
 		return $abbreviations;
 	}
+	private function abbreviationMergeV2($fragments)
+	{
+		$return_fragment = array();
+
+		$previous_string = '';
+		$previous_is_abbreviation = false;
+		$i = 0;
+
+		foreach ($fragments as $fragment) {
+			$current_string = $fragment;
+			$return_fragment[$i] = $current_string;
+			$words = mb_split('\s+', self::mbTrim($fragment));
+
+			$word_count = count($words);
+			$last_is_capital = preg_match('#^\p{Lu}#u', trim($words[$word_count-1]));
+			$last_is_abbreviation = substr(trim($fragment), -1) == '.';
+			
+			// this string ends in an abbreviation if the last word starts with a capital and ends with a period
+			if ($last_is_capital > 0 && $last_is_abbreviation > 0) {
+				$is_abbreviation = true;
+			} else {
+				$is_abbreviation = false;
+			}
+			if ($previous_is_abbreviation == true) {
+				$current_string = $previous_string . $current_string;
+			}
+			$return_fragment[$i] = $current_string;
+
+
+			$previous_is_abbreviation = $is_abbreviation;
+			$previous_string = $current_string;
+			if ($is_abbreviation == false) {
+				$i++;
+			}
+		}
+		return $return_fragment;
+	}
 
 	/**
 	 * Merges any part starting with a closing parenthesis ')' to the previous
@@ -327,7 +364,7 @@ class Sentence
 				$punctuations = $this->punctuationSplit($line);
 				$parentheses = $this->parenthesesMerge($punctuations); // also works after punctuationMerge or abbreviationMerge
 				$merges = $this->punctuationMerge($parentheses);
-				$shorts = $this->abbreviationMerge($merges);
+				$shorts = $this->abbreviationMergeV2($merges);
 				$sentences = array_merge($sentences, $this->sentenceMerge($shorts));
 			}
 		}
@@ -354,3 +391,4 @@ class Sentence
 	}
 
 }
+

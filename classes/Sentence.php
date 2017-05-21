@@ -1,10 +1,6 @@
 <?php
 
 /**
- originally from https://github.com/vanderlee/php-sentence
- with modifications by https://github.com/marktaw/php-sentence
-*/
-/**
  * Segments sentences.
  * Clipping may not be perfect.
  * Sentence count should be VERY close to the truth.
@@ -12,42 +8,11 @@
  * Multibyte safe (atleast for UTF-8), but rules based on germanic
  * language stucture (English, Dutch, German). Should work for most
  * latin-alphabet languages.
+ * 
+ * @author Martijn van der Lee (@vanderlee)
+ * @author @marktaw
  */
-class Sentence
-{
-	private static function cleanUnicode($str) {
-		//https://stackoverflow.com/questions/20025030/convert-all-types-of-smart-quotes-with-php
-		$chr_map = array(
-		   // Windows codepage 1252
-		   "\xC2\x82" => "'", // U+0082⇒U+201A single low-9 quotation mark
-		   "\xC2\x84" => '"', // U+0084⇒U+201E double low-9 quotation mark
-		   "\xC2\x8B" => "'", // U+008B⇒U+2039 single left-pointing angle quotation mark
-		   "\xC2\x91" => "'", // U+0091⇒U+2018 left single quotation mark
-		   "\xC2\x92" => "'", // U+0092⇒U+2019 right single quotation mark
-		   "\xC2\x93" => '"', // U+0093⇒U+201C left double quotation mark
-		   "\xC2\x94" => '"', // U+0094⇒U+201D right double quotation mark
-		   "\xC2\x9B" => "'", // U+009B⇒U+203A single right-pointing angle quotation mark
-
-		   // Regular Unicode     // U+0022 quotation mark (")
-								  // U+0027 apostrophe     (')
-		   "\xC2\xAB"     => '"', // U+00AB left-pointing double angle quotation mark
-		   "\xC2\xBB"     => '"', // U+00BB right-pointing double angle quotation mark
-		   "\xE2\x80\x98" => "'", // U+2018 left single quotation mark
-		   "\xE2\x80\x99" => "'", // U+2019 right single quotation mark
-		   "\xE2\x80\x9A" => "'", // U+201A single low-9 quotation mark
-		   "\xE2\x80\x9B" => "'", // U+201B single high-reversed-9 quotation mark
-		   "\xE2\x80\x9C" => '"', // U+201C left double quotation mark
-		   "\xE2\x80\x9D" => '"', // U+201D right double quotation mark
-		   "\xE2\x80\x9E" => '"', // U+201E double low-9 quotation mark
-		   "\xE2\x80\x9F" => '"', // U+201F double high-reversed-9 quotation mark
-		   "\xE2\x80\xB9" => "'", // U+2039 single left-pointing angle quotation mark
-		   "\xE2\x80\xBA" => "'", // U+203A single right-pointing angle quotation mark
-		);
-		$chr = array_keys  ($chr_map); // but: for efficiency you should
-		$rpl = array_values($chr_map); // pre-calculate these two arrays
-		$return = str_replace($chr, $rpl, html_entity_decode($str, ENT_QUOTES, "UTF-8"));
-		return($return);
-	}
+class Sentence {
 
 	/**
 	 * Specify this flag with the split method to trim whitespace.
@@ -160,6 +125,46 @@ class Sentence
 
 		return $lines;
 	}
+	
+	/**
+	 * Replcae 
+	 * @staticvar array $chr_map
+	 * @param String $string
+	 * @return String
+	 */
+	private static function cleanUnicode($string)
+	{
+		//https://stackoverflow.com/questions/20025030/convert-all-types-of-smart-quotes-with-php
+		static $character_map = array(
+			// Windows codepage 1252
+			"\xC2\x82" => "'", // U+0082⇒U+201A single low-9 quotation mark
+			"\xC2\x84" => '"', // U+0084⇒U+201E double low-9 quotation mark
+			"\xC2\x8B" => "'", // U+008B⇒U+2039 single left-pointing angle quotation mark
+			"\xC2\x91" => "'", // U+0091⇒U+2018 left single quotation mark
+			"\xC2\x92" => "'", // U+0092⇒U+2019 right single quotation mark
+			"\xC2\x93" => '"', // U+0093⇒U+201C left double quotation mark
+			"\xC2\x94" => '"', // U+0094⇒U+201D right double quotation mark
+			"\xC2\x9B" => "'", // U+009B⇒U+203A single right-pointing angle quotation mark
+			// Regular Unicode     // U+0022 quotation mark (")
+			// U+0027 apostrophe     (')
+			"\xC2\xAB" => '"', // U+00AB left-pointing double angle quotation mark
+			"\xC2\xBB" => '"', // U+00BB right-pointing double angle quotation mark
+			"\xE2\x80\x98" => "'", // U+2018 left single quotation mark
+			"\xE2\x80\x99" => "'", // U+2019 right single quotation mark
+			"\xE2\x80\x9A" => "'", // U+201A single low-9 quotation mark
+			"\xE2\x80\x9B" => "'", // U+201B single high-reversed-9 quotation mark
+			"\xE2\x80\x9C" => '"', // U+201C left double quotation mark
+			"\xE2\x80\x9D" => '"', // U+201D right double quotation mark
+			"\xE2\x80\x9E" => '"', // U+201E double low-9 quotation mark
+			"\xE2\x80\x9F" => '"', // U+201F double high-reversed-9 quotation mark
+			"\xE2\x80\xB9" => "'", // U+2039 single left-pointing angle quotation mark
+			"\xE2\x80\xBA" => "'", // U+203A single right-pointing angle quotation mark
+		);
+		
+		$character = array_keys($character_map); // but: for efficiency you should
+		$replace = array_values($character_map); // pre-calculate these two arrays
+		return str_replace($character, $replace, html_entity_decode($string, ENT_QUOTES, "UTF-8"));
+	}	
 
 	/**
 	 * Splits an array of lines by (consecutive sequences of)
@@ -222,7 +227,7 @@ class Sentence
 
 		foreach ($punctuations as $punctuation) {
 			if ($punctuation !== '') {
-				$merge.= $punctuation;
+				$merge .= $punctuation;
 				if (mb_strlen($punctuation) === 1 && in_array($punctuation, $this->terminals)) {
 					$merges[] = $merge;
 					$merge = '';
@@ -256,8 +261,7 @@ class Sentence
 	 * @param array $fragments
 	 * @return array
 	 */
-
-	private function abbreviationMergeV2($fragments)
+	private function abbreviationMerge($fragments)
 	{
 		$return_fragment = array();
 
@@ -270,9 +274,9 @@ class Sentence
 			$words = mb_split('\s+', self::mbTrim($fragment));
 
 			$word_count = count($words);
-			
+
 			// if last word of fragment starts with a Capital & ends in ".", trigger "is abbreviation"
-			$last_is_capital = preg_match('#^\p{Lu}#u', trim($words[$word_count-1]));
+			$last_is_capital = preg_match('#^\p{Lu}#u', trim($words[$word_count - 1]));
 			$last_is_abbreviation = substr(trim($fragment), -1) == '.';
 			if ($last_is_capital > 0 && $last_is_abbreviation > 0) {
 				$is_abbreviation = true;
@@ -307,7 +311,7 @@ class Sentence
 
 		foreach ($parts as $part) {
 			if ($part[0] === ')') {
-				$subsentences[count($subsentences)-1] .= $part;
+				$subsentences[count($subsentences) - 1] .= $part;
 			} else {
 				$subsentences[] = $part;
 			}
@@ -315,32 +319,32 @@ class Sentence
 
 		return $subsentences;
 	}
-	
+
 	/**
-	 Looks for closing quotes to include them with the previous statement.
-	 "That was very interesting," he said.
-	 "That was very interesting."
-	*/
-	private function closeQuotesMerge($statements) {
+	  Looks for closing quotes to include them with the previous statement.
+	  "That was very interesting," he said.
+	  "That was very interesting."
+	 */
+	private function closeQuotesMerge($statements)
+	{
 		$i = 0;
 		$previous_statement = "";
 		foreach ($statements as $statement) {
 			// detect end quote - if the entire string is a quotation mark, or it's [quote, space, lowercase]
 			if (trim($statement) == '"' || trim($statement) == "'" ||
 					(
-						( substr($statement, 0, 1) == '"' || substr($statement, 0, 1) == "'" )
-						and substr($statement, 1, 1) == " "
-						and ctype_lower(substr($statement, 2, 1)) == true
+					( substr($statement, 0, 1) == '"' || substr($statement, 0, 1) == "'" )
+					and substr($statement, 1, 1) == " "
+					and ctype_lower(substr($statement, 2, 1)) == true
 					)
-				) {
+			) {
 				$statement = $previous_statement . $statement;
 			} else {
 				$i++;
 			}
-			
+
 			$return[$i] = $statement;
 			$previous_statement = $statement;
-			
 		}
 		return($return);
 	}
@@ -374,7 +378,7 @@ class Sentence
 				$has_words = $has_words || $word_count > 1;
 			}
 
-			$sentence.= $short;
+			$sentence .= $short;
 			$previous_word_ending = mb_substr($short, -1);
 		}
 		if (!empty($sentence)) {
@@ -394,15 +398,17 @@ class Sentence
 	public function split($text, $flags = 0)
 	{
 		$sentences = array();
+
 		// clean funny quotes
-		$text = $this->cleanUnicode($text);
+		$text = self::cleanUnicode($text);
+
 		// Split
 		foreach (self::linebreakSplit($text) as $line) {
 			if (self::mbTrim($line) !== '') {
 				$punctuations = $this->punctuationSplit($line);
 				$parentheses = $this->parenthesesMerge($punctuations); // also works after punctuationMerge or abbreviationMerge
 				$merges = $this->punctuationMerge($parentheses);
-				$shorts = $this->abbreviationMergeV2($merges);
+				$shorts = $this->abbreviationMerge($merges);
 				$quotes = $this->closeQuotesMerge($shorts);
 				$sentences = array_merge($sentences, $this->sentenceMerge($quotes));
 			}

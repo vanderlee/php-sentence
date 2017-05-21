@@ -2,9 +2,10 @@ Sentence
 ========
 [![Build Status](https://travis-ci.org/vanderlee/php-sentence.svg)](https://travis-ci.org/vanderlee/php-sentence)
 
-Version 1.0.2
+Version 1.0.3
 
-Copyright &copy; 2016 Martijn van der Lee.
+Copyright &copy; 2016 Martijn van der Lee (@vanderlee).
+Copyright &copy; 2017 @marktaw.
 MIT Open Source license applies.
 
 Introduction

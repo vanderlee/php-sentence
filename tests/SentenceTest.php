@@ -129,6 +129,15 @@ class SentenceTest extends PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * @covers Sentence::cleanupUnicode
+	 */
+	public function testCleanupUnicode()
+	{
+		$this->assertSame(array('Fix "these" quotes'), $this->object->split('Fix "these" quotes'));
+		$this->assertSame(array('Fix "these" quotes'), $this->object->split("Fix \xC2\xABthese\xC2\xAB quotes"));
+	}
+
+	/**
 	 * @covers Sentence::split
 	 */
 	public function testSplitWord()
@@ -175,11 +184,13 @@ class SentenceTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testSplitAbreviations()
 	{
-		$this->markTestIncomplete('This test has not been implemented yet.');
+//		$this->markTestIncomplete('This test has not been implemented yet.');
 		$this->assertSame(array('Hello mr. Smith.'), $this->object->split("Hello mr. Smith."));
 		$this->assertSame(array('Hello, OMG Kittens!'), $this->object->split("Hello, OMG Kittens!"));
 		$this->assertSame(array('Hello, abbrev. Kittens!'), $this->object->split("Hello, abbrev. Kittens!"));
 		$this->assertSame(array('Hello, O.M.G. Kittens!'), $this->object->split("Hello, O.M.G. Kittens!"));
+		$this->assertSame(array('Last week, former director of the A.B.C. John B. Smith was fired.'), $this->object->split("Last week, former director of the A.B.C. John B. Smith was fired."));
+		$this->assertSame(array('Mr. Smith was not available for comment..'), $this->object->split("Mr. Smith was not available for comment.."));		
 	}
 
 	/**

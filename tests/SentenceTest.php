@@ -88,6 +88,8 @@ class SentenceTest extends PHPUnit_Framework_TestCase
 		$this->assertSame(1, $this->object->count("Hello, OMG Kittens!"));
 		$this->assertSame(1, $this->object->count("Hello, abbrev. Kittens!"));
 		$this->assertSame(1, $this->object->count("Hello, O.M.G. Kittens!"));
+		$this->assertSame(1, $this->object->count("Last week, former director of the A.B.C. John B. Smith was fired."));
+		$this->assertSame(1, $this->object->count("Mr. Smith was not available for comment.."));
 	}
 
 	/**

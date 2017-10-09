@@ -190,7 +190,8 @@ class SentenceTest extends PHPUnit_Framework_TestCase
 		$this->assertSame(array('Hello, abbrev. Kittens!'), $this->object->split("Hello, abbrev. Kittens!"));
 		$this->assertSame(array('Hello, O.M.G. Kittens!'), $this->object->split("Hello, O.M.G. Kittens!"));
 		$this->assertSame(array('Last week, former director of the A.B.C. John B. Smith was fired.'), $this->object->split("Last week, former director of the A.B.C. John B. Smith was fired."));
-		$this->assertSame(array('Mr. Smith was not available for comment..'), $this->object->split("Mr. Smith was not available for comment.."));		
+		$this->assertSame(array('Mr. Smith was not available for comment..'), $this->object->split("Mr. Smith was not available for comment.."));
+		$this->assertSame(array('Hello mr. Smith.', ' Are you there?'), $this->object->split("Hello mr. Smith. Are you there?"));
 	}
 
 	/**

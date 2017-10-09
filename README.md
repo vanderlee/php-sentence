@@ -2,7 +2,7 @@ Sentence
 ========
 [![Build Status](https://travis-ci.org/vanderlee/php-sentence.svg)](https://travis-ci.org/vanderlee/php-sentence)
 
-Version 1.0.3
+Version 1.0.4
 
 Copyright &copy; 2016 Martijn van der Lee (@vanderlee).
 Copyright &copy; 2017 @marktaw.
@@ -91,4 +91,4 @@ The following is a rough list of the rules used to split sentences.
 	-	It is preceded by one word, or...
 	-	It is followed by one word.
 -	A sequence of multiple periods is not considered the end of a sentence.
-		
+

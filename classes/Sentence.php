@@ -279,22 +279,18 @@ class Sentence {
 			$last_word = trim($words[$word_count - 1]);
 			$last_is_capital = preg_match('#^\p{Lu}#u', $last_word);
 			$last_is_abbreviation = substr(trim($fragment), -1) == '.';
-			if ($last_is_capital > 0 && $last_is_abbreviation > 0 && mb_strlen($last_word) <= 3) {
-				$is_abbreviation = true;
-			} else {
-				$is_abbreviation = false;
-			}
+			$is_abbreviation = $last_is_capital > 0 && $last_is_abbreviation > 0 && mb_strlen($last_word) <= 3;
+			
 			// merge previous fragment with this
-			if ($previous_is_abbreviation == true) {
+			if ($previous_is_abbreviation === true) {
 				$current_string = $previous_string . $current_string;
 			}
 			$return_fragment[$i] = $current_string;
 
-
 			$previous_is_abbreviation = $is_abbreviation;
 			$previous_string = $current_string;
 			// only increment if this isn't an abbreviation
-			if ($is_abbreviation == false) {
+			if ($is_abbreviation === false) {
 				$i++;
 			}
 		}
@@ -330,13 +326,14 @@ class Sentence {
 	{
 		$i = 0;
 		$previous_statement = "";
+		$return = array();
 		foreach ($statements as $statement) {
 			// detect end quote - if the entire string is a quotation mark, or it's [quote, space, lowercase]
 			if (trim($statement) == '"' || trim($statement) == "'" ||
 					(
-					( substr($statement, 0, 1) == '"' || substr($statement, 0, 1) == "'" )
-					and substr($statement, 1, 1) == " "
-					and ctype_lower(substr($statement, 2, 1)) == true
+					( substr($statement, 0, 1) === '"' || substr($statement, 0, 1) === "'" )
+					and substr($statement, 1, 1) === ' '
+					and ctype_lower(substr($statement, 2, 1)) === true
 					)
 			) {
 				$statement = $previous_statement . $statement;
@@ -347,6 +344,7 @@ class Sentence {
 			$return[$i] = $statement;
 			$previous_statement = $statement;
 		}
+		
 		return($return);
 	}
 

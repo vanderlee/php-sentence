@@ -1,0 +1,8 @@
+filter:
+    excluded_paths:
+        - tests/*
+        - example/*
+        - vendor/*
+checks:
+    php:
+        duplication: false

@@ -52,7 +52,7 @@ class Sentence {
 	 * @param string $string
 	 * @param int $limit
 	 * @param int $flags
-	 * @return array<integer,integer|string>
+	 * @return array
 	 */
 	private static function mbSplit($pattern, $string, $limit = -1, $flags = 0)
 	{

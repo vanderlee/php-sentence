@@ -4,11 +4,11 @@
  * Segments sentences.
  * Clipping may not be perfect.
  * Sentence count should be VERY close to the truth.
- * 
+ *
  * Multibyte safe (atleast for UTF-8), but rules based on germanic
  * language stucture (English, Dutch, German). Should work for most
  * latin-alphabet languages.
- * 
+ *
  * @author Martijn van der Lee (@vanderlee)
  * @author @marktaw
  */
@@ -103,9 +103,9 @@ class Sentence {
 	/**
 	 * Breaks a piece of text into lines by linebreak.
 	 * Eats up any linebreak characters as if one.
-	 * 
+	 *
 	 * Multibyte safe
-	 * 
+	 *
 	 * @param string $text
 	 * @return array
 	 */
@@ -125,9 +125,9 @@ class Sentence {
 
 		return $lines;
 	}
-	
+
 	/**
-	 * Replcae 
+	 * Replace
 	 * @staticvar array $chr_map
 	 * @param String $string
 	 * @return String
@@ -160,11 +160,11 @@ class Sentence {
 			"\xE2\x80\xB9" => "'", // U+2039 single left-pointing angle quotation mark
 			"\xE2\x80\xBA" => "'", // U+203A single right-pointing angle quotation mark
 		);
-		
+
 		$character = array_keys($character_map); // but: for efficiency you should
 		$replace = array_values($character_map); // pre-calculate these two arrays
 		return str_replace($character, $replace, html_entity_decode($string, ENT_QUOTES, "UTF-8"));
-	}	
+	}
 
 	/**
 	 * Splits an array of lines by (consecutive sequences of)
@@ -275,10 +275,11 @@ class Sentence {
 
 			$word_count = count($words);
 
-			// if last word of fragment starts with a Capital & ends in ".", trigger "is abbreviation"
-			$last_is_capital = preg_match('#^\p{Lu}#u', trim($words[$word_count - 1]));
+			// if last word of fragment starts with a Capital, ends in "." & has less than 3 characters, trigger "is abbreviation"
+			$last_word = trim($words[$word_count - 1]);
+			$last_is_capital = preg_match('#^\p{Lu}#u', $last_word);
 			$last_is_abbreviation = substr(trim($fragment), -1) == '.';
-			if ($last_is_capital > 0 && $last_is_abbreviation > 0) {
+			if ($last_is_capital > 0 && $last_is_abbreviation > 0 && mb_strlen($last_word) <= 3) {
 				$is_abbreviation = true;
 			} else {
 				$is_abbreviation = false;
@@ -351,9 +352,9 @@ class Sentence {
 
 	/**
 	 * Merges items into larger sentences.
-	 * 
+	 *
 	 * Multibyte safe
-	 * 
+	 *
 	 * @param array $shorts
 	 * @return array
 	 */

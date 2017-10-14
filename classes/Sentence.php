@@ -52,7 +52,7 @@ class Sentence {
 	 */
 	private static function mbSplit($pattern, $string, $limit = -1, $flags = 0)
 	{
-		$strlen = strlen($string);  // bytes!
+		$strlen = strlen($string); // bytes!
 		mb_ereg_search_init($string);
 
 		$lengths = array();
@@ -331,7 +331,7 @@ class Sentence {
 			// detect end quote - if the entire string is a quotation mark, or it's [quote, space, lowercase]
 			if (trim($statement) == '"' || trim($statement) == "'" ||
 					(
-					( substr($statement, 0, 1) === '"' || substr($statement, 0, 1) === "'" )
+					(substr($statement, 0, 1) === '"' || substr($statement, 0, 1) === "'")
 					and substr($statement, 1, 1) === ' '
 					and ctype_lower(substr($statement, 2, 1)) === true
 					)

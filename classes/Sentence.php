@@ -21,18 +21,21 @@ class Sentence {
 
 	/**
 	 * List of characters used to terminate sentences.
-	 * @var array
+	 * 
+	 * @var string[]
 	 */
 	private $terminals = array('.', '!', '?');
 
 	/**
 	 * List of characters used for abbreviations.
-	 * @var array
+	 * 
+	 * @var string[]
 	 */
 	private $abbreviators = array('.');
 
 	/**
 	 * Multibyte safe version of standard trim() function.
+	 * 
 	 * @param string $string
 	 * @return string
 	 */
@@ -44,11 +47,12 @@ class Sentence {
 	/**
 	 * A cross between mb_split and preg_split, adding the preg_split flags
 	 * to mb_split.
+	 * 
 	 * @param string $pattern
 	 * @param string $string
 	 * @param int $limit
 	 * @param int $flags
-	 * @return array
+	 * @return string[]
 	 */
 	private static function mbSplit($pattern, $string, $limit = -1, $flags = 0)
 	{
@@ -107,7 +111,7 @@ class Sentence {
 	 * Multibyte safe
 	 *
 	 * @param string $text
-	 * @return array
+	 * @return string[]
 	 */
 	private static function linebreakSplit($text)
 	{
@@ -128,9 +132,10 @@ class Sentence {
 
 	/**
 	 * Replace
+	 * 
 	 * @staticvar array $chr_map
-	 * @param String $string
-	 * @return String
+	 * @param string $string
+	 * @return string
 	 */
 	private static function cleanUnicode($string)
 	{
@@ -177,8 +182,8 @@ class Sentence {
 	 * 		... becomes ...
 	 * 	[ "There ", "...", " is", ".", " More", "!" ]
 	 *
-	 * @param array $lines
-	 * @return array
+	 * @param string $line
+	 * @return string[]
 	 */
 	private function punctuationSplit($line)
 	{
@@ -215,8 +220,8 @@ class Sentence {
 	 * 		... becomes ...
 	 * 	[ "There ... is.", "More!" ]
 	 *
-	 * @param array $punctuations
-	 * @return array
+	 * @param string[] $punctuations
+	 * @return string[]
 	 */
 	private function punctuationMerge($punctuations)
 	{
@@ -258,8 +263,8 @@ class Sentence {
 	 * 	[ "Last week, former director of the F.B.I. James B. Comey was fired." ]
 	 *  [ "Mr. Comey was not available for comment." ]
 	 *
-	 * @param array $fragments
-	 * @return array
+	 * @param string[] $fragments
+	 * @return string[]
 	 */
 	private function abbreviationMerge($fragments)
 	{
@@ -300,7 +305,9 @@ class Sentence {
 	/**
 	 * Merges any part starting with a closing parenthesis ')' to the previous
 	 * part.
-	 * @param array $parts
+	 * 
+	 * @param string[] $parts
+	 * @return string[]
 	 */
 	private function parenthesesMerge($parts)
 	{
@@ -318,9 +325,12 @@ class Sentence {
 	}
 
 	/**
-	  Looks for closing quotes to include them with the previous statement.
-	  "That was very interesting," he said.
-	  "That was very interesting."
+	 * Looks for closing quotes to include them with the previous statement.
+	 * "That was very interesting," he said.
+	 * "That was very interesting."
+	 * 
+	 * @param string[] $statements
+	 * @return string[]
 	 */
 	private function closeQuotesMerge($statements)
 	{
@@ -345,16 +355,15 @@ class Sentence {
 			$previous_statement = $statement;
 		}
 		
-		return($return);
+		return $return;
 	}
 
 	/**
 	 * Merges items into larger sentences.
-	 *
 	 * Multibyte safe
 	 *
-	 * @param array $shorts
-	 * @return array
+	 * @param string[] $shorts
+	 * @return string[]
 	 */
 	private function sentenceMerge($shorts)
 	{
@@ -392,7 +401,7 @@ class Sentence {
 	 * Set the Sentence::SPLIT_TRIM flag to trim whitespace.
 	 * @param string $text
 	 * @param integer $flags
-	 * @return array
+	 * @return string[]
 	 */
 	public function split($text, $flags = 0)
 	{

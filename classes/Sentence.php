@@ -300,7 +300,7 @@ class Sentence {
 	/**
 	 * Merges any part starting with a closing parenthesis ')' to the previous
 	 * part.
-	 * @param type $parts
+	 * @param array $parts
 	 */
 	private function parenthesesMerge($parts)
 	{
@@ -374,7 +374,7 @@ class Sentence {
 				$sentence = '';
 				$has_words = $word_count > 1;
 			} else {
-				$has_words = $has_words || $word_count > 1;
+				$has_words = ($has_words || $word_count > 1);
 			}
 
 			$sentence .= $short;

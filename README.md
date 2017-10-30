@@ -16,7 +16,7 @@ Sentence boundary disambiguation.
 Still early, but should support most western languages.
 If you find any problems, please let me know.
 
-Supports PHP 5.2 and up, so you can use it on older servers.
+Supports PHP 5.3 and up, so you can use it on older servers.
 
 Methods
 -------

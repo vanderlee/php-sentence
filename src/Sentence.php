@@ -121,20 +121,22 @@ class Sentence
         $merges = [];
         $merge = '';
 
-        foreach ($punctuations as $punctuation) {
-            if ($punctuation !== '') {
-                $merge .= $punctuation;
-                if (mb_strlen($punctuation) === 1
-                    && in_array($punctuation, $this->terminals)) {
-                    $merges[] = $merge;
-                    $merge = '';
-                } else {
-                    foreach ($definite_terminals as $terminal) {
-                        if (mb_strpos($punctuation, $terminal) !== false) {
-                            $merges[] = $merge;
-                            $merge = '';
-                            break;
-                        }
+        $filtered = array_filter($punctuations, function ($p) {
+            return $p !== '';
+        });
+
+        foreach ($filtered as $punctuation) {
+            $merge .= $punctuation;
+            if (mb_strlen($punctuation) === 1
+                && in_array($punctuation, $this->terminals)) {
+                $merges[] = $merge;
+                $merge = '';
+            } else {
+                foreach ($definite_terminals as $terminal) {
+                    if (mb_strpos($punctuation, $terminal) !== false) {
+                        $merges[] = $merge;
+                        $merge = '';
+                        break;
                     }
                 }
             }
@@ -162,38 +164,48 @@ class Sentence
     {
         $return_fragment = [];
 
-        $previous_string = '';
+        $previous_fragment = '';
         $previous_is_abbreviation = false;
         $i = 0;
-
         foreach ($fragments as $fragment) {
-            $current_string = $fragment;
-            $words = mb_split('\s+', Multibyte::trim($fragment));
-
-            $word_count = count($words);
-
-            // if last word of fragment starts with a Capital, ends in "." & has less than 3 characters, trigger "is abbreviation"
-            $last_word = trim($words[$word_count - 1]);
-            $last_is_capital = preg_match('#^\p{Lu}#u', $last_word);
-            $last_is_abbreviation = substr(trim($fragment), -1) === '.';
-            $is_abbreviation = $last_is_capital > 0
-                && $last_is_abbreviation > 0
-                && mb_strlen($last_word) <= 3;
+            $is_abbreviation = self::isAbreviation($fragment);
 
             // merge previous fragment with this
-            if ($previous_is_abbreviation === true) {
-                $current_string = $previous_string . $current_string;
+            if ($previous_is_abbreviation) {
+                $fragment = $previous_fragment . $fragment;
             }
-            $return_fragment[$i] = $current_string;
+            $return_fragment[$i] = $fragment;
 
             $previous_is_abbreviation = $is_abbreviation;
-            $previous_string = $current_string;
+            $previous_fragment = $fragment;
+
             // only increment if this isn't an abbreviation
-            if ($is_abbreviation === false) {
+            if (!$is_abbreviation) {
                 $i++;
             }
         }
         return $return_fragment;
+    }
+
+    /**
+     * Check if the last word of fragment starts with a Capital, ends in "." & has less than 3 characters.
+     *
+     * @param $fragment
+     * @return bool
+     */
+    private static function isAbreviation($fragment)
+    {
+        $words = mb_split('\s+', Multibyte::trim($fragment));
+
+        $word_count = count($words);
+
+        $last_word = Multibyte::trim($words[$word_count - 1]);
+        $last_is_capital = preg_match('#^\p{Lu}#u', $last_word);
+        $last_is_abbreviation = mb_substr(Multibyte::trim($fragment), -1) === '.';
+
+        return $last_is_capital > 0
+            && $last_is_abbreviation > 0
+            && mb_strlen($last_word) <= 3;
     }
 
     /**
@@ -229,19 +241,10 @@ class Sentence
     private function closeQuotesMerge($statements)
     {
         $i = 0;
-        $previous_statement = "";
+        $previous_statement = '';
         $return = [];
         foreach ($statements as $statement) {
-            // detect end quote - if the entire string is a quotation mark, or it's [quote, space, lowercase]
-            if (trim($statement) === '"'
-                || trim($statement) === "'"
-                || (
-                    (substr($statement, 0, 1) === '"'
-                        || substr($statement, 0, 1) === "'")
-                    && substr($statement, 1, 1) === ' '
-                    && ctype_lower(substr($statement, 2, 1)) === true
-                )
-            ) {
+            if (self::isEndQuote($statement)) {
                 $statement = $previous_statement . $statement;
             } else {
                 $i++;
@@ -252,6 +255,25 @@ class Sentence
         }
 
         return $return;
+    }
+
+    /**
+     * Check if the entire string is a quotation mark or quote, then space, then lowercase.
+     *
+     * @param $statement
+     * @return bool
+     */
+    private static function isEndQuote($statement)
+    {
+        $trimmed = Multibyte::trim($statement);
+        $first = mb_substr($statement, 0, 1);
+
+        return in_array($trimmed, ['"', '\''])
+            || (
+                in_array($first, ['"', '\''])
+                && mb_substr($statement, 1, 1) === ' '
+                && ctype_lower(mb_substr($statement, 2, 1)) === true
+            );
     }
 
     /**
@@ -276,17 +298,20 @@ class Sentence
 
             if ($after_non_abbreviating_terminal
                 || ($has_words && $word_count > 1)) {
+
                 $sentences[] = $sentence;
+
                 $sentence = '';
-                $has_words = $word_count > 1;
-            } else {
-                $has_words = ($has_words
-                    || $word_count > 1);
+                $has_words = false;
             }
+
+            $has_words = $has_words
+                || $word_count > 1;
 
             $sentence .= $short;
             $previous_word_ending = mb_substr($short, -1);
         }
+
         if (!empty($sentence)) {
             $sentences[] = $sentence;
         }
@@ -341,7 +366,7 @@ class Sentence
      */
     private static function trimSentences($sentences)
     {
-        return array_map(function($sentence) {
+        return array_map(function ($sentence) {
             return Multibyte::trim($sentence);
         }, $sentences);
     }

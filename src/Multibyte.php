@@ -91,28 +91,38 @@ class Multibyte
                 && $split_empty
                 && ++$count > $limit) {
 
-                $cut = mb_strcut($string, $position);
+                $parts[] = self::makePart($string, $position, null, $offset_capture);
+                return $parts;
+            }
 
-                $parts[] = $offset_capture
-                    ? [$cut, $position]
-                    : $cut;
-
-                break;
-            } elseif ((!$is_delimiter
+            if ((!$is_delimiter
                     || $is_captured)
                 && $split_empty) {
 
-                $cut = mb_strcut($string, $position, $length[0]);
-
-                $parts[] = $offset_capture
-                    ? [$cut, $position]
-                    : $cut;
+                $parts[] = self::makePart($string, $position, $length[0], $offset_capture);
             }
 
             $position += $length[0];
         }
 
         return $parts;
+    }
+
+    /**
+     * Make part
+     * @param string $string
+     * @param integer $position
+     * @param integer|null $length
+     * @param bool $offset_capture
+     * @return array|string
+     */
+    private static function makePart($string, $position, $length = null, $offset_capture = false)
+    {
+        $cut = mb_strcut($string, $position, $length);
+
+        return $offset_capture
+            ? [$cut, $position]
+            : $cut;
     }
 
     /**

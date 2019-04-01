@@ -17,7 +17,7 @@
     "source": "https://github.com/vanderlee/php-sentence"
   },
   "require": {
-    "php": ">=5.3.0",
+    "php": ">=5.4.0",
     "ext-mbstring": "*",
     "ext-ctype": "*"
   },

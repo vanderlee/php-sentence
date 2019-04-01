@@ -27,14 +27,14 @@ class Sentence
      *
      * @var string[]
      */
-    private $terminals = array('.', '!', '?');
+    private $terminals = ['.', '!', '?'];
 
     /**
      * List of characters used for abbreviations.
      *
      * @var string[]
      */
-    private $abbreviators = array('.');
+    private $abbreviators = ['.'];
 
     /**
      * Breaks a piece of text into lines by linebreak.
@@ -47,7 +47,7 @@ class Sentence
      */
     private static function linebreakSplit($text)
     {
-        $lines = array();
+        $lines = [];
         $line = '';
 
         foreach (Multibyte::split('([\r\n]+)', $text, -1, PREG_SPLIT_DELIM_CAPTURE) as $part) {
@@ -72,7 +72,7 @@ class Sentence
     private static function cleanUnicode($string)
     {
         //https://stackoverflow.com/questions/20025030/convert-all-types-of-smart-quotes-with-php
-        static $character_map = array(
+        static $character_map = [
             // Windows codepage 1252
             "\xC2\x82" => "'", // U+0082⇒U+201A single low-9 quotation mark
             "\xC2\x84" => '"', // U+0084⇒U+201E double low-9 quotation mark
@@ -96,7 +96,7 @@ class Sentence
             "\xE2\x80\x9F" => '"', // U+201F double high-reversed-9 quotation mark
             "\xE2\x80\xB9" => "'", // U+2039 single left-pointing angle quotation mark
             "\xE2\x80\xBA" => "'", // U+203A single right-pointing angle quotation mark
-        );
+        ];
 
         $character = array_keys($character_map); // but: for efficiency you should
         $replace = array_values($character_map); // pre-calculate these two arrays
@@ -119,7 +119,7 @@ class Sentence
      */
     private function punctuationSplit($line)
     {
-        $parts = array();
+        $parts = [];
 
         $chars = preg_split('//u', $line, -1, PREG_SPLIT_NO_EMPTY); // This is UTF8 multibyte safe!
         $is_terminal = in_array($chars[0], $this->terminals);
@@ -159,7 +159,7 @@ class Sentence
     {
         $definite_terminals = array_diff($this->terminals, $this->abbreviators);
 
-        $merges = array();
+        $merges = [];
         $merge = '';
 
         foreach ($punctuations as $punctuation) {
@@ -201,7 +201,7 @@ class Sentence
      */
     private function abbreviationMerge($fragments)
     {
-        $return_fragment = array();
+        $return_fragment = [];
 
         $previous_string = '';
         $previous_is_abbreviation = false;
@@ -246,7 +246,7 @@ class Sentence
      */
     private function parenthesesMerge($parts)
     {
-        $subsentences = array();
+        $subsentences = [];
 
         foreach ($parts as $part) {
             if ($part[0] === ')') {
@@ -271,7 +271,7 @@ class Sentence
     {
         $i = 0;
         $previous_statement = "";
-        $return = array();
+        $return = [];
         foreach ($statements as $statement) {
             // detect end quote - if the entire string is a quotation mark, or it's [quote, space, lowercase]
             if (trim($statement) === '"'
@@ -306,7 +306,7 @@ class Sentence
     {
         $non_abbreviating_terminals = array_diff($this->terminals, $this->abbreviators);
 
-        $sentences = array();
+        $sentences = [];
 
         $sentence = '';
         $has_words = false;
@@ -344,20 +344,26 @@ class Sentence
      */
     public function split($text, $flags = 0)
     {
-        $sentences = array();
+        static $pipeline = [
+            'punctuationSplit',
+            'parenthesesMerge', // also works after punctuationMerge or abbreviationMerge
+            'punctuationMerge',
+            'abbreviationMerge',
+            'closeQuotesMerge',
+            'sentenceMerge',
+        ];
 
         // clean funny quotes
         $text = self::cleanUnicode($text);
 
         // Split
-        foreach (self::linebreakSplit($text) as $line) {
-            if (Multibyte::trim($line) !== '') {
-                $punctuations = $this->punctuationSplit($line);
-                $parentheses = $this->parenthesesMerge($punctuations); // also works after punctuationMerge or abbreviationMerge
-                $merges = $this->punctuationMerge($parentheses);
-                $shorts = $this->abbreviationMerge($merges);
-                $quotes = $this->closeQuotesMerge($shorts);
-                $sentences = array_merge($sentences, $this->sentenceMerge($quotes));
+        $sentences = [];
+        foreach (self::linebreakSplit($text) as $input) {
+            if (Multibyte::trim($input) !== '') {
+                foreach ($pipeline as $method) {
+                    $input = $this->$method($input);
+                }
+                $sentences = array_merge($sentences, $input);
             }
         }
 
@@ -376,11 +382,9 @@ class Sentence
      */
     private static function trimSentences($sentences)
     {
-        $trimmed = array();
-        foreach ($sentences as $sentence) {
-            $trimmed[] = Multibyte::trim($sentence);
-        }
-        return $trimmed;
+        return array_map(function($sentence) {
+            return Multibyte::trim($sentence);
+        }, $sentences);
     }
 
     /**

@@ -34,64 +34,78 @@ class Multibyte
         $offset_capture = (bool)($flags & PREG_SPLIT_OFFSET_CAPTURE);
         $delim_capture = (bool)($flags & PREG_SPLIT_DELIM_CAPTURE);
 
-        $strlen = strlen($string); // bytes!
-        mb_ereg_search_init($string);
-
-        $lengths = array();
-        $position = 0;
-        while (($array = mb_ereg_search_pos($pattern, '')) !== false) {
-            // capture split
-            $lengths[] = array($array[0] - $position, false, null);
-
-            // move position
-            $position = $array[0] + $array[1];
-
-            // capture delimiter
-            $regs = mb_ereg_search_getregs();
-            $lengths[] = array($array[1], true, isset($regs[1]) && $regs[1]);
-
-            // Continue on?
-            if ($position >= $strlen) {
-                break;
-            }
-        }
-
-        // Add last bit, if not ending with split
-        $lengths[] = array($strlen - $position, false, null);
+        $lengths = self::getSplitLengths($pattern, $string);
 
         // Substrings
-        $parts = array();
+        $parts = [];
         $position = 0;
         $count = 1;
         foreach ($lengths as $length) {
-            $split_empty = $length[0] || !$split_no_empty;
+            $split_empty = !$split_no_empty || $length[0];
             $is_delimiter = $length[1];
-            $is_captured = $length[2];
+            $is_captured = $delim_capture && $length[2];
 
             if ($limit > 0
                 && !$is_delimiter
                 && $split_empty
                 && ++$count > $limit) {
-                if ($length[0] > 0
-                    || $split_empty) {
-                    $parts[] = $offset_capture
-                        ? array(mb_strcut($string, $position), $position)
-                        : mb_strcut($string, $position);
-                }
+
+                $cut = mb_strcut($string, $position);
+
+                $parts[] = $offset_capture
+                    ? [$cut, $position]
+                    : $cut;
+
                 break;
             } elseif ((!$is_delimiter
-                    || ($delim_capture
-                        && $is_captured))
-                && ($length[0]
-                    || $split_empty)) {
+                    || $is_captured)
+                && $split_empty) {
+
+                $cut = mb_strcut($string, $position, $length[0]);
+
                 $parts[] = $offset_capture
-                    ? array(mb_strcut($string, $position, $length[0]), $position)
-                    : mb_strcut($string, $position, $length[0]);
+                    ? [$cut, $position]
+                    : $cut;
             }
 
             $position += $length[0];
         }
 
         return $parts;
+    }
+
+    /**
+     * Splits the string by pattern and for each element (part or split) returns:
+     *  [ 0 => length, 1 => is_delimiter?, 2 =>
+     *
+     * @param $pattern
+     * @param $string
+     * @return array
+     */
+    private static function getSplitLengths($pattern, $string)
+    {
+        $strlen = strlen($string); // bytes!
+        $lengths = [];
+
+        mb_ereg_search_init($string);
+
+        $position = 0;
+        while ($position < $strlen
+            && ($array = mb_ereg_search_pos($pattern, '')) !== false) {
+            // capture split
+            $lengths[] = [$array[0] - $position, false, null];
+
+            // move position
+            $position = $array[0] + $array[1];
+
+            // capture delimiter
+            $regs = mb_ereg_search_getregs();
+            $lengths[] = [$array[1], true, isset($regs[1]) && $regs[1]];
+        }
+
+        // Add last bit, if not ending with split
+        $lengths[] = [$strlen - $position, false, null];
+
+        return $lengths;
     }
 }

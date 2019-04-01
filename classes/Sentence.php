@@ -91,17 +91,29 @@ class Sentence
         $position = 0;
         $count = 1;
         foreach ($lengths as $length) {
-            $split_empty = ($length[0] || !$split_no_empty);
+            $split_empty = $length[0] || !$split_no_empty;
             $is_delimiter = $length[1];
             $is_captured = $length[2];
 
-            if ($limit > 0 && !$is_delimiter && $split_empty && ++$count > $limit) {
-                if ($length[0] > 0 || $split_empty) {
-                    $parts[] = $offset_capture ? array(mb_strcut($string, $position), $position) : mb_strcut($string, $position);
+            if ($limit > 0
+                && !$is_delimiter
+                && $split_empty
+                && ++$count > $limit) {
+                if ($length[0] > 0
+                    || $split_empty) {
+                    $parts[] = $offset_capture
+                        ? array(mb_strcut($string, $position), $position)
+                        : mb_strcut($string, $position);
                 }
                 break;
-            } elseif ((!$is_delimiter || ($delim_capture && $is_captured)) && ($length[0] || $split_empty)) {
-                $parts[] = $offset_capture ? array(mb_strcut($string, $position, $length[0]), $position) : mb_strcut($string, $position, $length[0]);
+            } elseif ((!$is_delimiter
+                    || ($delim_capture
+                        && $is_captured))
+                && ($length[0]
+                    || $split_empty)) {
+                $parts[] = $offset_capture
+                    ? array(mb_strcut($string, $position, $length[0]), $position)
+                    : mb_strcut($string, $position, $length[0]);
             }
 
             $position += $length[0];
@@ -239,7 +251,8 @@ class Sentence
         foreach ($punctuations as $punctuation) {
             if ($punctuation !== '') {
                 $merge .= $punctuation;
-                if (mb_strlen($punctuation) === 1 && in_array($punctuation, $this->terminals)) {
+                if (mb_strlen($punctuation) === 1
+                    && in_array($punctuation, $this->terminals)) {
                     $merges[] = $merge;
                     $merge = '';
                 } else {
@@ -289,8 +302,10 @@ class Sentence
             // if last word of fragment starts with a Capital, ends in "." & has less than 3 characters, trigger "is abbreviation"
             $last_word = trim($words[$word_count - 1]);
             $last_is_capital = preg_match('#^\p{Lu}#u', $last_word);
-            $last_is_abbreviation = substr(trim($fragment), -1) == '.';
-            $is_abbreviation = $last_is_capital > 0 && $last_is_abbreviation > 0 && mb_strlen($last_word) <= 3;
+            $last_is_abbreviation = substr(trim($fragment), -1) === '.';
+            $is_abbreviation = $last_is_capital > 0
+                && $last_is_abbreviation > 0
+                && mb_strlen($last_word) <= 3;
 
             // merge previous fragment with this
             if ($previous_is_abbreviation === true) {
@@ -345,11 +360,13 @@ class Sentence
         $return = array();
         foreach ($statements as $statement) {
             // detect end quote - if the entire string is a quotation mark, or it's [quote, space, lowercase]
-            if (trim($statement) == '"' || trim($statement) == "'" ||
-                (
-                    (substr($statement, 0, 1) === '"' || substr($statement, 0, 1) === "'")
-                    and substr($statement, 1, 1) === ' '
-                    and ctype_lower(substr($statement, 2, 1)) === true
+            if (trim($statement) === '"'
+                || trim($statement) === "'"
+                || (
+                    (substr($statement, 0, 1) === '"'
+                        || substr($statement, 0, 1) === "'")
+                    && substr($statement, 1, 1) === ' '
+                    && ctype_lower(substr($statement, 2, 1)) === true
                 )
             ) {
                 $statement = $previous_statement . $statement;
@@ -384,12 +401,14 @@ class Sentence
             $word_count = count(mb_split('\s+', self::mbTrim($short)));
             $after_non_abbreviating_terminal = in_array($previous_word_ending, $non_abbreviating_terminals);
 
-            if ($after_non_abbreviating_terminal || ($has_words && $word_count > 1)) {
+            if ($after_non_abbreviating_terminal
+                || ($has_words && $word_count > 1)) {
                 $sentences[] = $sentence;
                 $sentence = '';
                 $has_words = $word_count > 1;
             } else {
-                $has_words = ($has_words || $word_count > 1);
+                $has_words = ($has_words
+                    || $word_count > 1);
             }
 
             $sentence .= $short;
@@ -430,13 +449,24 @@ class Sentence
 
         // Post process
         if ($flags & self::SPLIT_TRIM) {
-            foreach ($sentences as &$sentence) {
-                $sentence = self::mbTrim($sentence);
-            }
-            unset($sentence);
+            return self::trimSentences($sentences);
         }
 
         return $sentences;
+    }
+
+    /**
+     * Multibyte trim each string in an array.
+     * @param string[] $sentences
+     * @return string[]
+     */
+    private static function trimSentences($sentences)
+    {
+        $trimmed = array();
+        foreach ($sentences as $sentence) {
+            $trimmed[] = self::mbTrim($sentence);
+        }
+        return $trimmed;
     }
 
     /**

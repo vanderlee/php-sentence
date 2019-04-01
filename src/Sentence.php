@@ -1,11 +1,13 @@
 <?php
 
+namespace Vanderlee\Sentence;
+
 /**
  * Segments sentences.
  * Clipping may not be perfect.
  * Sentence count should be VERY close to the truth.
  *
- * Multibyte safe (atleast for UTF-8), but rules based on germanic
+ * Multibyte.php safe (atleast for UTF-8), but rules based on germanic
  * language stucture (English, Dutch, German). Should work for most
  * latin-alphabet languages.
  *
@@ -35,98 +37,10 @@ class Sentence
     private $abbreviators = array('.');
 
     /**
-     * Multibyte safe version of standard trim() function.
-     *
-     * @param string $string
-     * @return string
-     */
-    private static function mbTrim($string)
-    {
-        return mb_ereg_replace('^\s*([\s\S]*?)\s*$', '\1', $string);
-    }
-
-    /**
-     * A cross between mb_split and preg_split, adding the preg_split flags
-     * to mb_split.
-     *
-     * @param string $pattern
-     * @param string $string
-     * @param int $limit
-     * @param int $flags
-     * @return array
-     */
-    private static function mbSplit($pattern, $string, $limit = -1, $flags = 0)
-    {
-        $split_no_empty = (bool)($flags & PREG_SPLIT_NO_EMPTY);
-        $offset_capture = (bool)($flags & PREG_SPLIT_OFFSET_CAPTURE);
-        $delim_capture = (bool)($flags & PREG_SPLIT_DELIM_CAPTURE);
-
-        $strlen = strlen($string); // bytes!
-        mb_ereg_search_init($string);
-
-        $lengths = array();
-        $position = 0;
-        while (($array = mb_ereg_search_pos($pattern, '')) !== false) {
-            // capture split
-            $lengths[] = array($array[0] - $position, false, null);
-
-            // move position
-            $position = $array[0] + $array[1];
-
-            // capture delimiter
-            $regs = mb_ereg_search_getregs();
-            $lengths[] = array($array[1], true, isset($regs[1]) && $regs[1]);
-
-            // Continue on?
-            if ($position >= $strlen) {
-                break;
-            }
-        }
-
-        // Add last bit, if not ending with split
-        $lengths[] = array($strlen - $position, false, null);
-
-        // Substrings
-        $parts = array();
-        $position = 0;
-        $count = 1;
-        foreach ($lengths as $length) {
-            $split_empty = $length[0] || !$split_no_empty;
-            $is_delimiter = $length[1];
-            $is_captured = $length[2];
-
-            if ($limit > 0
-                && !$is_delimiter
-                && $split_empty
-                && ++$count > $limit) {
-                if ($length[0] > 0
-                    || $split_empty) {
-                    $parts[] = $offset_capture
-                        ? array(mb_strcut($string, $position), $position)
-                        : mb_strcut($string, $position);
-                }
-                break;
-            } elseif ((!$is_delimiter
-                    || ($delim_capture
-                        && $is_captured))
-                && ($length[0]
-                    || $split_empty)) {
-                $parts[] = $offset_capture
-                    ? array(mb_strcut($string, $position, $length[0]), $position)
-                    : mb_strcut($string, $position, $length[0]);
-            }
-
-            $position += $length[0];
-        }
-
-        return $parts;
-    }
-
-    /**
      * Breaks a piece of text into lines by linebreak.
      * Eats up any linebreak characters as if one.
      *
-     * Multibyte safe
+     * Multibyte.php safe
      *
      * @param string $text
      * @return string[]
@@ -136,9 +50,9 @@ class Sentence
         $lines = array();
         $line = '';
 
-        foreach (self::mbSplit('([\r\n]+)', $text, -1, PREG_SPLIT_DELIM_CAPTURE) as $part) {
+        foreach (Multibyte::split('([\r\n]+)', $text, -1, PREG_SPLIT_DELIM_CAPTURE) as $part) {
             $line .= $part;
-            if (self::mbTrim($part) === '') {
+            if (Multibyte::trim($part) === '') {
                 $lines[] = $line;
                 $line = '';
             }
@@ -193,7 +107,7 @@ class Sentence
      * Splits an array of lines by (consecutive sequences of)
      * terminals, keeping terminals.
      *
-     * Multibyte safe (atleast for UTF-8)
+     * Multibyte.php safe (atleast for UTF-8)
      *
      * For example:
      *    "There ... is. More!"
@@ -231,7 +145,7 @@ class Sentence
      * Appends each terminal item after it's preceding
      * non-terminals.
      *
-     * Multibyte safe (atleast for UTF-8)
+     * Multibyte.php safe (atleast for UTF-8)
      *
      * For example:
      *    [ "There ", "...", " is", ".", " More", "!" ]
@@ -295,7 +209,7 @@ class Sentence
 
         foreach ($fragments as $fragment) {
             $current_string = $fragment;
-            $words = mb_split('\s+', self::mbTrim($fragment));
+            $words = mb_split('\s+', Multibyte::trim($fragment));
 
             $word_count = count($words);
 
@@ -383,7 +297,7 @@ class Sentence
 
     /**
      * Merges items into larger sentences.
-     * Multibyte safe
+     * Multibyte.php safe
      *
      * @param string[] $shorts
      * @return string[]
@@ -398,7 +312,7 @@ class Sentence
         $has_words = false;
         $previous_word_ending = null;
         foreach ($shorts as $short) {
-            $word_count = count(mb_split('\s+', self::mbTrim($short)));
+            $word_count = count(mb_split('\s+', Multibyte::trim($short)));
             $after_non_abbreviating_terminal = in_array($previous_word_ending, $non_abbreviating_terminals);
 
             if ($after_non_abbreviating_terminal
@@ -437,7 +351,7 @@ class Sentence
 
         // Split
         foreach (self::linebreakSplit($text) as $line) {
-            if (self::mbTrim($line) !== '') {
+            if (Multibyte::trim($line) !== '') {
                 $punctuations = $this->punctuationSplit($line);
                 $parentheses = $this->parenthesesMerge($punctuations); // also works after punctuationMerge or abbreviationMerge
                 $merges = $this->punctuationMerge($parentheses);
@@ -456,7 +370,7 @@ class Sentence
     }
 
     /**
-     * Multibyte trim each string in an array.
+     * Multibyte.php trim each string in an array.
      * @param string[] $sentences
      * @return string[]
      */
@@ -464,7 +378,7 @@ class Sentence
     {
         $trimmed = array();
         foreach ($sentences as $sentence) {
-            $trimmed[] = self::mbTrim($sentence);
+            $trimmed[] = Multibyte::trim($sentence);
         }
         return $trimmed;
     }

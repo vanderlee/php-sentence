@@ -1,6 +1,10 @@
 <?php
 
-class SentenceTest extends PHPUnit_Framework_TestCase
+namespace Vanderlee\Sentence\Tests;
+
+use Vanderlee\Sentence\Sentence;
+
+class SentenceTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -14,7 +18,7 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new Sentence;
+        $this->object = new \Vanderlee\Sentence\Sentence();
     }
 
     /**

@@ -1,15 +1,16 @@
 Sentence
 ========
-[![Build Status](https://travis-ci.org/vanderlee/php-sentence.svg)](https://travis-ci.org/vanderlee/php-sentence)
+[![License](https://img.shields.io/github/license/vanderlee/php-sentence.svg)]()
+[![Build Status](https://travis-ci.org/vanderlee/php-sentence.svg?branch=master)](https://travis-ci.org/vanderlee/PHPSwaggerGen)
+[![Quality](https://scrutinizer-ci.com/g/vanderlee/php-sentence/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/vanderlee/PHPSwaggerGen)
 
-Version 1.0.4
+Version 1.0.5
 
-Copyright &copy; 2016 Martijn van der Lee (@vanderlee).
-Copyright &copy; 2017 @marktaw.
+Copyright &copy; 2016-2019 Martijn van der Lee (@vanderlee), parts copyright &copy; 2017 @marktaw.
+
 MIT Open Source license applies.
 
-Introduction
-------------
+## Introduction
 PHP natural language sentence segmentation (splitting) and counting.
 Sentence boundary disambiguation.
 
@@ -18,8 +19,16 @@ If you find any problems, please let me know.
 
 Supports PHP 5.3 and up, so you can use it on older servers.
 
-Methods
--------
+## Installation
+Requires PHP 5.4 or greater. PHP 5.3 is supported as long as no more recent
+features are absolutely necessary. There is no guarantee SwaggerGen will
+continue to work on PHP 5.3 in the future.
+
+To install using Composer:
+
+	composer require vanderlee/swaggergen
+	
+## Methods
 ### ***`integer`*** `count(`***`string`*** `$text)`
 Counts the number of sentences in the text.
 Provided for convenience; this is exactly the same as counting the number of
@@ -33,16 +42,11 @@ Splits the text into sentences.
 -	**`Sentence::SPLIT_TRIM`**: Trim whitespace off the left and right sides of
 	each returned sentence.
 
-Documentation
--------------
+## Documentation
 You can find documentation generated from the source code by ApiGen here: [ApiGen documentation](doc/)
 
-Examples
-========
+# Examples
 	<?php
-
-		// Include the autoloader.
-		require_once 'classes/autoloader.php';
 
 		// This is the test text we're going to use
 		$text	= "Hello there, Mr. Smith. What're you doing today... Smith,"
@@ -50,7 +54,7 @@ Examples
 				. " cost you $2.50! Just kidding :)";
 
 		// Create a new instance
-		$Sentence	= new Sentence;
+		$Sentence	= new Vanderlee\Sentence\Sentence;
 
 		// Split into array of sentences
 		$sentences	= $Sentence->split($text);
@@ -60,8 +64,7 @@ Examples
 
 	?>
 
-Background
-==========
+# How it works
 The method used is not based on any on the established or published methods.
 It seems to work pretty well, though.
 
@@ -76,8 +79,7 @@ sentence count except in very uncommon situations.
 It should be noted that this algorithm depends on reasonably gramatically
 correct punctuation. Do not L33t-5p3ak!!!!!1!1!11!eleven!!
 
-Rules
------
+## Rules
 The following is a rough list of the rules used to split sentences.
 
 -	Each linebreak separates sentences.

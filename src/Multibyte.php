@@ -71,9 +71,7 @@ class Multibyte
      */
     public static function split($pattern, $string, $limit = -1, $flags = 0)
     {
-        $split_no_empty = (bool)($flags & PREG_SPLIT_NO_EMPTY);
         $offset_capture = (bool)($flags & PREG_SPLIT_OFFSET_CAPTURE);
-        $delim_capture = (bool)($flags & PREG_SPLIT_DELIM_CAPTURE);
 
         $lengths = self::getSplitLengths($pattern, $string);
 
@@ -82,23 +80,12 @@ class Multibyte
         $position = 0;
         $count = 1;
         foreach ($lengths as $length) {
-            $split_empty = !$split_no_empty || $length[0];
-            $is_delimiter = $length[1];
-            $is_captured = $delim_capture && $length[2];
-
-            if ($limit > 0
-                && !$is_delimiter
-                && $split_empty
-                && ++$count > $limit) {
-
+            if (self::isLastPart($length, $flags, $limit, $count)) {
                 $parts[] = self::makePart($string, $position, null, $offset_capture);
                 return $parts;
             }
 
-            if ((!$is_delimiter
-                    || $is_captured)
-                && $split_empty) {
-
+            if (self::isPart($length, $flags)) {
                 $parts[] = self::makePart($string, $position, $length[0], $offset_capture);
             }
 
@@ -106,6 +93,40 @@ class Multibyte
         }
 
         return $parts;
+    }
+
+    /**
+     * @param $length
+     * @param $flags
+     * @param $limit
+     * @param $count
+     * @return bool
+     */
+    private static function isLastPart($length, $flags, $limit, &$count)
+    {
+        $split_empty = !($flags & PREG_SPLIT_NO_EMPTY) || $length[0];
+        $is_delimiter = $length[1];
+
+        return $limit > 0
+            && !$is_delimiter
+            && $split_empty
+            && ++$count > $limit;
+    }
+
+    /**
+     * @param $length
+     * @param $flags
+     * @return bool
+     */
+    private static function isPart($length, $flags)
+    {
+        $split_empty = !($flags & PREG_SPLIT_NO_EMPTY) || $length[0];
+        $is_delimiter = $length[1];
+        $is_captured = ($flags & PREG_SPLIT_DELIM_CAPTURE) && $length[2];
+
+        return (!$is_delimiter
+                || $is_captured)
+            && $split_empty;
     }
 
     /**

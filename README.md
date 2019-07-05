@@ -21,12 +21,11 @@ Supports PHP 5.3 and up, so you can use it on older servers.
 
 ## Installation
 Requires PHP 5.4 or greater. PHP 5.3 is supported as long as no more recent
-features are absolutely necessary. There is no guarantee SwaggerGen will
-continue to work on PHP 5.3 in the future.
+features are absolutely necessary.
 
 To install using Composer:
 
-	composer require vanderlee/swaggergen
+	composer require vanderlee/php-sentence
 	
 ## Methods
 ### ***`integer`*** `count(`***`string`*** `$text)`
@@ -54,7 +53,7 @@ You can find documentation generated from the source code by ApiGen here: [ApiGe
 				. " cost you $2.50! Just kidding :)";
 
 		// Create a new instance
-		$Sentence	= new Vanderlee\Sentence\Sentence;
+		$Sentence	= new \Sentence;
 
 		// Split into array of sentences
 		$sentences	= $Sentence->split($text);

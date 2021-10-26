@@ -37,6 +37,51 @@ class Sentence
     private $abbreviators = ['.'];
 
     /**
+     * List of float numbers in the text
+     *
+     * @var string[]
+     */
+    private $floatNumbers = [];
+
+    /**
+     * Clean floating point numbers by replace them with their md5 hash
+     *
+     * @param string $text
+     *
+     * @return string
+     */
+    private function floatNumberClean(string $text)
+    {
+        preg_match_all('!\d+(?:\.\d+)?!', $text, $matches);
+
+        foreach ($matches[0] as $floatNumber) {
+            $this->floatNumbers[$floatNumber] = md5($floatNumber);
+
+            $text = str_replace($floatNumber, md5($floatNumber), $text);
+        }
+
+        return $text;
+    }
+
+    /**
+     * Revert the hashed floating number back
+     *
+     * @param string[] $text
+     *
+     * @return string[]
+     */
+    private function floatNumberRevert($text)
+    {
+        
+        return array_map(function($value) {
+            foreach ($this->floatNumbers as $number => $hash) {
+                $value = str_replace($hash, $number, $value);
+            }
+            return $value;
+        }, $text);
+    }
+
+    /**
      * Breaks a piece of text into lines by linebreak.
      * Eats up any linebreak characters as if one.
      *
@@ -329,12 +374,14 @@ class Sentence
     public function split($text, $flags = 0)
     {
         static $pipeline = [
+            'floatNumberClean',
             'punctuationSplit',
             'parenthesesMerge', // also works after punctuationMerge or abbreviationMerge
             'punctuationMerge',
             'abbreviationMerge',
             'closeQuotesMerge',
             'sentenceMerge',
+            'floatNumberRevert'
         ];
 
         // clean funny quotes

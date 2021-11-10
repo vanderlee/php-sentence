@@ -224,4 +224,15 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array("(What) you here.", " Mister Smith"), $this->object->split("(What) you here. Mister Smith"));
     }
 
+    /**
+     * @covers Sentence::split
+     */
+    public function testSentenceWithNumericValues()
+    {
+        $this->assertSame(1, $this->object->count("The price is ￡25.50, including postage and packing."));
+        $this->assertSame(1, $this->object->count("The price is 25.50, including postage and packing."));
+        $this->assertSame(1, $this->object->count("I went true to size at 10.5 cms."));
+        $this->assertSame(2, $this->object->count("The prices are ￡25.50 or ￡27.50, including postage and packing. I went true to size at 10.5 cms."));
+    }
+
 }

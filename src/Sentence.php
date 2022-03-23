@@ -54,6 +54,7 @@ class Sentence
     {
         preg_match_all('!\d+(?:\.\d+)?!', $text, $matches);
 
+        $this->floatNumbers = [];
         foreach ($matches[0] as $floatNumber) {
             if (isset($this->floatNumbers[$floatNumber])) {
                 continue;

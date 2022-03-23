@@ -253,6 +253,7 @@ class SentenceTest extends PHPUnit_Framework_TestCase
     public function testSplit(array $expected, string $text)
     {
         $this->assertSame($expected, $this->object->split($text));
+        $this->assertSame(count($expected), $this->object->count($text));
     }
 
     public function dataSplit()
@@ -278,6 +279,18 @@ class SentenceTest extends PHPUnit_Framework_TestCase
                     'Number 00.20 it is',
                 ],
                 'Number 00.20 it is',
+            ],
+            'Bug report #15; ))) -1 index offset' => [
+                [
+                    ')))'
+                ],
+                ')))',
+            ],
+            'Price' => [
+                [
+                    'The price is 25.50, including postage and packing.'
+                ],
+                'The price is 25.50, including postage and packing.',
             ],
         ];
     }

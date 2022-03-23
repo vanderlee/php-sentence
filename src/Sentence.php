@@ -55,9 +55,13 @@ class Sentence
         preg_match_all('!\d+(?:\.\d+)?!', $text, $matches);
 
         foreach ($matches[0] as $floatNumber) {
-            $this->floatNumbers[$floatNumber] = md5($floatNumber);
+            if (isset($this->floatNumbers[$floatNumber])) {
+                continue;
+            }
 
-            $text = str_replace($floatNumber, md5($floatNumber), $text);
+            $hash = md5($floatNumber);
+            $this->floatNumbers[$floatNumber] = $hash;
+            $text = str_replace($floatNumber, $hash, $text);
         }
 
         return $text;
@@ -72,7 +76,6 @@ class Sentence
      */
     private function floatNumberRevert($text)
     {
-        
         return array_map(function($value) {
             foreach ($this->floatNumbers as $number => $hash) {
                 $value = str_replace($hash, $number, $value);

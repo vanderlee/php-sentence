@@ -2,9 +2,13 @@
 
 namespace Vanderlee\Sentence\Tests;
 
+use PHPUnit_Framework_TestCase;
 use Vanderlee\Sentence\Sentence;
 
-class SentenceTest extends \PHPUnit_Framework_TestCase
+/**
+ * @coversDefaultClass \Vanderlee\Sentence\Sentence
+ */
+class SentenceTest extends PHPUnit_Framework_TestCase
 {
 
     /**
@@ -22,7 +26,7 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sentence::count
+     * @covers ::count
      */
     public function testCountEmpty()
     {
@@ -32,7 +36,7 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sentence::count
+     * @covers ::count
      */
     public function testCountWord()
     {
@@ -45,7 +49,7 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sentence::count
+     * @covers ::count
      */
     public function testCountTwoWords()
     {
@@ -58,7 +62,7 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sentence::count
+     * @covers ::count
      */
     public function testCountMultipleWords()
     {
@@ -70,7 +74,7 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sentence::count
+     * @covers ::count
      */
     public function testCountLinebreaks()
     {
@@ -84,7 +88,7 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sentence::count
+     * @covers ::count
      */
     public function testCountAbreviations()
     {
@@ -97,7 +101,7 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sentence::count
+     * @covers ::count
      */
     public function testCountMultiplePunctuation()
     {
@@ -110,7 +114,7 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sentence::count
+     * @covers ::count
      */
     public function testCountOneWordSentences()
     {
@@ -123,109 +127,109 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Sentence::split
+     * @covers ::split
      */
     public function testSplitEmpty()
     {
-        $this->assertSame(array(), $this->object->split(''));
-        $this->assertSame(array(), $this->object->split(' '));
-        $this->assertSame(array(), $this->object->split("\n"));
+        $this->assertSame([], $this->object->split(''));
+        $this->assertSame([], $this->object->split(' '));
+        $this->assertSame([], $this->object->split("\n"));
     }
 
     /**
-     * @covers Sentence::cleanupUnicode
+     * @covers ::cleanupUnicode
      */
     public function testCleanupUnicode()
     {
-        $this->assertSame(array('Fix "these" quotes'), $this->object->split('Fix "these" quotes'));
-        $this->assertSame(array('Fix "these" quotes'), $this->object->split("Fix \xC2\xABthese\xC2\xAB quotes"));
+        $this->assertSame(['Fix "these" quotes'], $this->object->split('Fix "these" quotes'));
+        $this->assertSame(['Fix "these" quotes'], $this->object->split("Fix \xC2\xABthese\xC2\xAB quotes"));
     }
 
     /**
-     * @covers Sentence::split
+     * @covers ::split
      */
     public function testSplitWord()
     {
-        $this->assertSame(array('Hello'), $this->object->split('Hello'));
-        $this->assertSame(array('Hello.'), $this->object->split('Hello.'));
-        $this->assertSame(array('Hello...'), $this->object->split('Hello...'));
-        $this->assertSame(array('Hello!'), $this->object->split('Hello!'));
-        $this->assertSame(array('Hello?'), $this->object->split('Hello?'));
-        $this->assertSame(array('Hello?!'), $this->object->split('Hello?!'));
+        $this->assertSame(['Hello'], $this->object->split('Hello'));
+        $this->assertSame(['Hello.'], $this->object->split('Hello.'));
+        $this->assertSame(['Hello...'], $this->object->split('Hello...'));
+        $this->assertSame(['Hello!'], $this->object->split('Hello!'));
+        $this->assertSame(['Hello?'], $this->object->split('Hello?'));
+        $this->assertSame(['Hello?!'], $this->object->split('Hello?!'));
     }
 
     /**
-     * @covers Sentence::split
+     * @covers ::split
      */
     public function testSplitMultipleWords()
     {
-        $this->assertSame(array('Hello world.', ' Are you there'), $this->object->split('Hello world. Are you there'));
-        $this->assertSame(array('Hello world.', ' Are you there?'), $this->object->split('Hello world. Are you there?'));
-        $this->assertSame(array('Hello world.', 'Are you there'), $this->object->split('Hello world. Are you there', Sentence::SPLIT_TRIM));
-        $this->assertSame(array('Hello world.', 'Are you there?'), $this->object->split('Hello world. Are you there?', Sentence::SPLIT_TRIM));
-        $this->assertSame(array('Hello world, Are you there?'), $this->object->split('Hello world, Are you there?'));
-        $this->assertSame(array('Hello world: Are you there?'), $this->object->split('Hello world: Are you there?'));
-        $this->assertSame(array('Hello world... Are you there?'), $this->object->split('Hello world... Are you there?'));
+        $this->assertSame(['Hello world.', ' Are you there'], $this->object->split('Hello world. Are you there'));
+        $this->assertSame(['Hello world.', ' Are you there?'], $this->object->split('Hello world. Are you there?'));
+        $this->assertSame(['Hello world.', 'Are you there'], $this->object->split('Hello world. Are you there', Sentence::SPLIT_TRIM));
+        $this->assertSame(['Hello world.', 'Are you there?'], $this->object->split('Hello world. Are you there?', Sentence::SPLIT_TRIM));
+        $this->assertSame(['Hello world, Are you there?'], $this->object->split('Hello world, Are you there?'));
+        $this->assertSame(['Hello world: Are you there?'], $this->object->split('Hello world: Are you there?'));
+        $this->assertSame(['Hello world... Are you there?'], $this->object->split('Hello world... Are you there?'));
     }
 
     /**
-     * @covers Sentence::split
+     * @covers ::split
      */
     public function testSplitLinebreaks()
     {
-        $this->assertSame(array("Hello world...\r", "Are you there?"), $this->object->split("Hello world...\rAre you there?"));
-        $this->assertSame(array("Hello world...\n", " Are you there?"), $this->object->split("Hello world...\n Are you there?"));
-        $this->assertSame(array("Hello world...\n", "Are you there?"), $this->object->split("Hello world...\nAre you there?"));
-        $this->assertSame(array("Hello world...\r\n", "Are you there?"), $this->object->split("Hello world...\r\nAre you there?"));
-        $this->assertSame(array("Hello world...\r\n\r", "Are you there?"), $this->object->split("Hello world...\r\n\rAre you there?"));
-        $this->assertSame(array("Hello world...\n\r\n", "Are you there?"), $this->object->split("Hello world...\n\r\nAre you there?"));
-        $this->assertSame(array("Hello world...\n\n", "Are you there?"), $this->object->split("Hello world...\n\nAre you there?"));
-        $this->assertSame(array("Hello world...\r\r", "Are you there?"), $this->object->split("Hello world...\r\rAre you there?"));
+        $this->assertSame(["Hello world...\r", "Are you there?"], $this->object->split("Hello world...\rAre you there?"));
+        $this->assertSame(["Hello world...\n", " Are you there?"], $this->object->split("Hello world...\n Are you there?"));
+        $this->assertSame(["Hello world...\n", "Are you there?"], $this->object->split("Hello world...\nAre you there?"));
+        $this->assertSame(["Hello world...\r\n", "Are you there?"], $this->object->split("Hello world...\r\nAre you there?"));
+        $this->assertSame(["Hello world...\r\n\r", "Are you there?"], $this->object->split("Hello world...\r\n\rAre you there?"));
+        $this->assertSame(["Hello world...\n\r\n", "Are you there?"], $this->object->split("Hello world...\n\r\nAre you there?"));
+        $this->assertSame(["Hello world...\n\n", "Are you there?"], $this->object->split("Hello world...\n\nAre you there?"));
+        $this->assertSame(["Hello world...\r\r", "Are you there?"], $this->object->split("Hello world...\r\rAre you there?"));
     }
 
     /**
-     * @covers Sentence::split
+     * @covers ::split
      */
     public function testSplitAbreviations()
     {
 //		$this->markTestIncomplete('This test has not been implemented yet.');
-        $this->assertSame(array('Hello mr. Smith.'), $this->object->split("Hello mr. Smith."));
-        $this->assertSame(array('Hello, OMG Kittens!'), $this->object->split("Hello, OMG Kittens!"));
-        $this->assertSame(array('Hello, abbrev. Kittens!'), $this->object->split("Hello, abbrev. Kittens!"));
-        $this->assertSame(array('Hello, O.M.G. Kittens!'), $this->object->split("Hello, O.M.G. Kittens!"));
-        $this->assertSame(array('Last week, former director of the A.B.C. John B. Smith was fired.'), $this->object->split("Last week, former director of the A.B.C. John B. Smith was fired."));
-        $this->assertSame(array('Mr. Smith was not available for comment..'), $this->object->split("Mr. Smith was not available for comment.."));
-        $this->assertSame(array('Hello mr. Smith.', ' Are you there?'), $this->object->split("Hello mr. Smith. Are you there?"));
+        $this->assertSame(['Hello mr. Smith.'], $this->object->split("Hello mr. Smith."));
+        $this->assertSame(['Hello, OMG Kittens!'], $this->object->split("Hello, OMG Kittens!"));
+        $this->assertSame(['Hello, abbrev. Kittens!'], $this->object->split("Hello, abbrev. Kittens!"));
+        $this->assertSame(['Hello, O.M.G. Kittens!'], $this->object->split("Hello, O.M.G. Kittens!"));
+        $this->assertSame(['Last week, former director of the A.B.C. John B. Smith was fired.'], $this->object->split("Last week, former director of the A.B.C. John B. Smith was fired."));
+        $this->assertSame(['Mr. Smith was not available for comment..'], $this->object->split("Mr. Smith was not available for comment.."));
+        $this->assertSame(['Hello mr. Smith.', ' Are you there?'], $this->object->split("Hello mr. Smith. Are you there?"));
     }
 
     /**
-     * @covers Sentence::split
+     * @covers ::split
      */
     public function testSplitOneWordSentences()
     {
-        $this->assertSame(array("You?", " Smith?"), $this->object->split("You? Smith?"));
-        $this->assertSame(array("You there?", " Smith?"), $this->object->split("You there? Smith?"));
-        $this->assertSame(array("You mr. Smith?"), $this->object->split("You mr. Smith?"));
-        $this->assertSame(array("Are you there.", " Mister Smith?"), $this->object->split("Are you there. Mister Smith?"));
-        $this->assertSame(array("Are you there.", " Smith, sir?"), $this->object->split("Are you there. Smith, sir?"));
-        $this->assertSame(array("Are you there.", " Mr. Smith?"), $this->object->split("Are you there. Mr. Smith?"));
+        $this->assertSame(["You?", " Smith?"], $this->object->split("You? Smith?"));
+        $this->assertSame(["You there?", " Smith?"], $this->object->split("You there? Smith?"));
+        $this->assertSame(["You mr. Smith?"], $this->object->split("You mr. Smith?"));
+        $this->assertSame(["Are you there.", " Mister Smith?"], $this->object->split("Are you there. Mister Smith?"));
+        $this->assertSame(["Are you there.", " Smith, sir?"], $this->object->split("Are you there. Smith, sir?"));
+        $this->assertSame(["Are you there.", " Mr. Smith?"], $this->object->split("Are you there. Mr. Smith?"));
     }
 
     /**
-     * @covers Sentence::split
+     * @covers ::split
      */
     public function testSplitParenthesis()
     {
-        $this->assertSame(array("You there (not here!).", " Mister Smith"), $this->object->split("You there (not here!). Mister Smith"));
-        $this->assertSame(array("You (not him!) here.", " Mister Smith"), $this->object->split("You (not him!) here. Mister Smith"));
-        $this->assertSame(array("(What!) you here.", " Mister Smith"), $this->object->split("(What!) you here. Mister Smith"));
-        $this->assertSame(array("You there (not here).", " Mister Smith"), $this->object->split("You there (not here). Mister Smith"));
-        $this->assertSame(array("You (not him) here.", " Mister Smith"), $this->object->split("You (not him) here. Mister Smith"));
-        $this->assertSame(array("(What) you here.", " Mister Smith"), $this->object->split("(What) you here. Mister Smith"));
+        $this->assertSame(["You there (not here!).", " Mister Smith"], $this->object->split("You there (not here!). Mister Smith"));
+        $this->assertSame(["You (not him!) here.", " Mister Smith"], $this->object->split("You (not him!) here. Mister Smith"));
+        $this->assertSame(["(What!) you here.", " Mister Smith"], $this->object->split("(What!) you here. Mister Smith"));
+        $this->assertSame(["You there (not here).", " Mister Smith"], $this->object->split("You there (not here). Mister Smith"));
+        $this->assertSame(["You (not him) here.", " Mister Smith"], $this->object->split("You (not him) here. Mister Smith"));
+        $this->assertSame(["(What) you here.", " Mister Smith"], $this->object->split("(What) you here. Mister Smith"));
     }
 
     /**
-     * @covers Sentence::split
+     * @covers ::split
      */
     public function testSentenceWithNumericValues()
     {
@@ -234,5 +238,43 @@ class SentenceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, $this->object->count("I went true to size at 10.5 cms."));
         $this->assertSame(2, $this->object->count("The prices are ￡25.50 or ￡27.50, including postage and packing. I went true to size at 10.5 cms."));
     }
+
+    /**
+     * @covers ::floatNumberClean
+     * @covers ::floatNumberRevert
+     *
+     * @dataProvider dataSplit
+     *
+     * @param string[] $expected
+     * @param string   $text
+     *
+     * @return void
+     */
+    public function testSplit(array $expected, string $text)
+    {
+        $this->assertSame($expected, $this->object->split($text));
+    }
+
+    public function dataSplit()
+    {
+        return [
+            'repeat 2' => [
+                [
+                    'He got £2.',
+                    ' He lost £2.',
+                    ' He had £2.',
+                ],
+                'He got £2. He lost £2. He had £2.',
+            ],
+            'times' => [
+                [
+                    'If at 8:00 pm, do something, there is a good chance that by 8:45 pm we do something else.',
+                    ' This is another sentence',
+                ],
+                'If at 8:00 pm, do something, there is a good chance that by 8:45 pm we do something else. This is another sentence',
+            ],
+        ];
+    }
+
 
 }

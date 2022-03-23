@@ -16,7 +16,6 @@ namespace Vanderlee\Sentence;
  */
 class Sentence
 {
-
     /**
      * Specify this flag with the split method to trim whitespace.
      */
@@ -41,45 +40,61 @@ class Sentence
      *
      * @var string[]
      */
-    private $floatNumbers = [];
+    private $replacements = [];
 
     /**
-     * Clean floating point numbers by replace them with their md5 hash
+     * Generate an in-text replacement code for the specified index
+     *
+     * @param string $index
+     *
+     * @return string
+     */
+    private function getReplaceCode(string $index)
+    {
+        return 0x02 . $index . 0x03;
+    }
+
+    /**
+     * Clean floating point numbers by replace them with an in-text index
      *
      * @param string $text
      *
      * @return string
      */
-    private function floatNumberClean(string $text)
+    private function replaceFloatNumbers(string $text)
     {
-        preg_match_all('!\d+(?:\.\d+)?!', $text, $matches);
+        preg_match_all('!\d+(?:\.\d+)?!', $text, $matches, PREG_OFFSET_CAPTURE);
 
-        $this->floatNumbers = [];
-        foreach ($matches[0] as $floatNumber) {
-            if (isset($this->floatNumbers[$floatNumber])) {
-                continue;
-            }
+        $this->replacements = [];
+        $index = 0;
+        foreach (array_reverse($matches[0]) as $match) {
+            $number = $match[0];
+            $offset = $match[1];
+            $code = $this->getReplaceCode($index);
 
-            $hash = md5($floatNumber);
-            $this->floatNumbers[$floatNumber] = $hash;
-            $text = str_replace($floatNumber, $hash, $text);
+            $this->replacements[$index] = $number;
+
+            $text = substr_replace($text, $code, $offset, mb_strlen($number));
+
+            ++$index;
         }
 
         return $text;
     }
 
     /**
-     * Revert the hashed floating number back
+     * Restore any stored replacements
      *
      * @param string[] $text
      *
      * @return string[]
      */
-    private function floatNumberRevert($text)
+    private function restoreReplacements($text)
     {
         return array_map(function($value) {
-            foreach ($this->floatNumbers as $number => $hash) {
-                $value = str_replace($hash, $number, $value);
+            foreach ($this->replacements as $index => $number) {
+                $code = $this->getReplaceCode($index);
+                $value = str_replace($code, $number, $value);
             }
             return $value;
         }, $text);
@@ -378,14 +393,14 @@ class Sentence
     public function split($text, $flags = 0)
     {
         static $pipeline = [
-            'floatNumberClean',
+            'replaceFloatNumbers',
             'punctuationSplit',
             'parenthesesMerge', // also works after punctuationMerge or abbreviationMerge
             'punctuationMerge',
             'abbreviationMerge',
             'closeQuotesMerge',
             'sentenceMerge',
-            'floatNumberRevert'
+            'restoreReplacements'
         ];
 
         // clean funny quotes

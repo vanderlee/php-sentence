@@ -292,6 +292,13 @@ class SentenceTest extends PHPUnit_Framework_TestCase
                 ],
                 'The price is 25.50, including postage and packing.',
             ],
+            'Recursive replacement' => [
+                [
+                    'From 11 to 12.',
+                    ' From 11 to 15.',
+                ],
+                'From 11 to 12. From 11 to 15.',
+            ],
         ];
     }
 }

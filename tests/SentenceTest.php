@@ -258,7 +258,7 @@ class SentenceTest extends PHPUnit_Framework_TestCase
     public function dataSplit()
     {
         return [
-            'repeat 2' => [
+            'repeat 2'             => [
                 [
                     'He got £2.',
                     ' He lost £2.',
@@ -266,15 +266,19 @@ class SentenceTest extends PHPUnit_Framework_TestCase
                 ],
                 'He got £2. He lost £2. He had £2.',
             ],
-            'times' => [
+            'times'                => [
                 [
                     'If at 8:00 pm, do something, there is a good chance that by 8:45 pm we do something else.',
                     ' This is another sentence',
                 ],
                 'If at 8:00 pm, do something, there is a good chance that by 8:45 pm we do something else. This is another sentence',
             ],
+            'lead/trailing zeroes' => [
+                [
+                    'Number 00.20 it is',
+                ],
+                'Number 00.20 it is',
+            ],
         ];
     }
-
-
 }

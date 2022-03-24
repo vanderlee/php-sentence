@@ -16,6 +16,7 @@ namespace Vanderlee\Sentence;
  */
 class Sentence
 {
+
     /**
      * Specify this flag with the split method to trim whitespace.
      */
@@ -36,7 +37,7 @@ class Sentence
     private $abbreviators = ['.'];
 
     /**
-     * List of float numbers in the text
+     * List of replacements in the text.
      *
      * @var string[]
      */
@@ -45,11 +46,11 @@ class Sentence
     /**
      * Generate an in-text replacement code for the specified index
      *
-     * @param string $index
+     * @param int $index
      *
      * @return string
      */
-    private function getReplaceCode(string $index)
+    private function getReplaceCode(int $index)
     {
         return 0x02 . $index . 0x03;
     }
@@ -74,7 +75,7 @@ class Sentence
 
             $this->replacements[$index] = $number;
 
-            $text = substr_replace($text, $code, $offset, mb_strlen($number));
+            $text = (string)substr_replace($text, $code, $offset, mb_strlen($number));
 
             ++$index;
         }
@@ -91,11 +92,12 @@ class Sentence
      */
     private function restoreReplacements($text)
     {
-        return array_map(function($value) {
+        return array_map(function ($value) {
             foreach ($this->replacements as $index => $number) {
                 $code = $this->getReplaceCode($index);
                 $value = str_replace($code, $number, $value);
             }
+
             return $value;
         }, $text);
     }
@@ -107,6 +109,7 @@ class Sentence
      * Multibyte.php safe
      *
      * @param string $text
+     *
      * @return string[]
      */
     private static function linebreakSplit($text)
@@ -138,6 +141,7 @@ class Sentence
      *    [ "There ", "...", " is", ".", " More", "!" ]
      *
      * @param string $line
+     *
      * @return string[]
      */
     private function punctuationSplit($line)
@@ -148,7 +152,7 @@ class Sentence
         $is_terminal = in_array($chars[0], $this->terminals);
 
         $part = '';
-        foreach ($chars as $index => $char) {
+        foreach ($chars as $char) {
             if (in_array($char, $this->terminals) !== $is_terminal) {
                 $parts[] = $part;
                 $part = '';
@@ -176,6 +180,7 @@ class Sentence
      *    [ "There ... is.", "More!" ]
      *
      * @param string[] $punctuations
+     *
      * @return string[]
      */
     private function punctuationMerge($punctuations)
@@ -222,6 +227,7 @@ class Sentence
      *  [ "Mr. Comey was not available for comment." ]
      *
      * @param string[] $fragments
+     *
      * @return string[]
      */
     private function abbreviationMerge($fragments)
@@ -248,6 +254,7 @@ class Sentence
                 $i++;
             }
         }
+
         return $return_fragment;
     }
 
@@ -255,6 +262,7 @@ class Sentence
      * Check if the last word of fragment starts with a Capital, ends in "." & has less than 3 characters.
      *
      * @param $fragment
+     *
      * @return bool
      */
     private static function isAbreviation($fragment)
@@ -277,6 +285,7 @@ class Sentence
      * part.
      *
      * @param string[] $parts
+     *
      * @return string[]
      */
     private function parenthesesMerge($parts)
@@ -284,7 +293,7 @@ class Sentence
         $subsentences = [];
 
         foreach ($parts as $part) {
-            if ($part[0] === ')') {
+            if ($part[0] === ')' && !empty($subsentences)) {
                 $subsentences[count($subsentences) - 1] .= $part;
             } else {
                 $subsentences[] = $part;
@@ -300,6 +309,7 @@ class Sentence
      * "That was very interesting."
      *
      * @param string[] $statements
+     *
      * @return string[]
      */
     private function closeQuotesMerge($statements)
@@ -325,6 +335,7 @@ class Sentence
      * Check if the entire string is a quotation mark or quote, then space, then lowercase.
      *
      * @param $statement
+     *
      * @return bool
      */
     private static function isEndQuote($statement)
@@ -345,6 +356,7 @@ class Sentence
      * Multibyte.php safe
      *
      * @param string[] $shorts
+     *
      * @return string[]
      */
     private function sentenceMerge($shorts)
@@ -386,8 +398,10 @@ class Sentence
     /**
      * Return the sentences sentences detected in the provided text.
      * Set the Sentence::SPLIT_TRIM flag to trim whitespace.
-     * @param string $text
+     *
+     * @param string  $text
      * @param integer $flags
+     *
      * @return string[]
      */
     public function split($text, $flags = 0)
@@ -400,7 +414,7 @@ class Sentence
             'abbreviationMerge',
             'closeQuotesMerge',
             'sentenceMerge',
-            'restoreReplacements'
+            'restoreReplacements',
         ];
 
         // clean funny quotes
@@ -427,7 +441,9 @@ class Sentence
 
     /**
      * Multibyte.php trim each string in an array.
+     *
      * @param string[] $sentences
+     *
      * @return string[]
      */
     private static function trimSentences($sentences)
@@ -439,7 +455,9 @@ class Sentence
 
     /**
      * Return the number of sentences detected in the provided text.
+     *
      * @param string $text
+     *
      * @return integer
      */
     public function count($text)

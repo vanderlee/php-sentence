@@ -406,16 +406,18 @@ class Sentence
      */
     public function split($text, $flags = 0)
     {
-        static $pipeline = [
-            'replaceFloatNumbers',
-            'punctuationSplit',
-            'parenthesesMerge', // also works after punctuationMerge or abbreviationMerge
-            'punctuationMerge',
-            'abbreviationMerge',
-            'closeQuotesMerge',
-            'sentenceMerge',
-            'restoreReplacements',
-        ];
+        if (empty($pipeline)) {
+            static $pipeline = [
+                'replaceFloatNumbers',
+                'punctuationSplit',
+                'parenthesesMerge', // also works after punctuationMerge or abbreviationMerge
+                'punctuationMerge',
+                'abbreviationMerge',
+                'closeQuotesMerge',
+                'sentenceMerge',
+                'restoreReplacements',
+            ];
+        }
 
         // clean funny quotes
         $text = Multibyte::cleanUnicode($text);

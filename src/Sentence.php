@@ -149,11 +149,20 @@ class Sentence
         $parts = [];
 
         $chars = preg_split('//u', $line, -1, PREG_SPLIT_NO_EMPTY); // This is UTF8 multibyte safe!
-        $is_terminal = in_array($chars[0], $this->terminals);
+        //add space after each terminal because every sentence ends with terminal and whitespace
+        $terminals = array_map(function($terminal)
+            {
+                return sprintf('%s ', $terminal);
+            },
+            $this->terminals
+        );
+        $is_terminal = in_array($chars[0], $terminals);
 
         $part = '';
-        foreach ($chars as $char) {
-            if (in_array($char, $this->terminals) !== $is_terminal) {
+        foreach ($chars as $key => $char) {
+            $nextChar = isset($chars[$key + 1]) ? $chars[$key + 1] : '';
+            $checkChar = sprintf('%s%s', $char, $nextChar); //try to find something like ". ", "! " or "? "
+            if (in_array($checkChar, $terminals) !== $is_terminal) {
                 $parts[] = $part;
                 $part = '';
                 $is_terminal = !$is_terminal;

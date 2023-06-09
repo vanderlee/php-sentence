@@ -28,4 +28,22 @@ class MultibyteTest extends \PHPUnit_Framework_TestCase
             [['a', '-', 'b', '-', 'c'], '(-)', 'a-b-c', -1, PREG_SPLIT_DELIM_CAPTURE],
         ];
     }
+
+
+    /**
+     * @dataProvider dataTrim
+     */
+    public function testTrim($subject, $expected=null)
+    {
+        if ($expected === null) $expected = $subject;
+        $this->assertSame($expected, Multibyte::trim($subject));
+    }
+
+    public function dataTrim()
+    {
+        return [
+            ['^ Old    ^  New       ^'],
+            ['^ Old                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ^ New                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^'],
+        ];
+    }
 }

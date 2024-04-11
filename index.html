@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>PHP Sentence</title>
@@ -125,11 +125,9 @@
 						code[l] = tabsToSpaces(code[l], tabsize);
 					}
 
-
 					// determine minimum length
-					var minlength = 2E53;
-					var first = 2E53;
-					var last = 0;
+					var first = 2E53,
+						last = 0;
 					for (l in code) {
 						if (/\S/.test(code[l])) {
 							minlength = Math.min(minlength, /^\s*/.exec(code[l])[0].length);
@@ -197,7 +195,7 @@
 		</div>
 		
 		<div id="footer">
-			Copyright &copy; 2016 Martijn van der Lee. MIT Open Source license applies.
+			Copyright &copy; 2016-2024 Martijn van der Lee. MIT Open Source license applies.
 		</div>
 	</body>
 </html>

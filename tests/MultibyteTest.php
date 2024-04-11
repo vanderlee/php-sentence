@@ -2,9 +2,13 @@
 
 namespace Vanderlee\Sentence\Tests;
 
+use PHPUnit_Framework_TestCase;
 use Vanderlee\Sentence\Multibyte;
 
-class MultibyteTest extends \PHPUnit_Framework_TestCase
+/**
+ * @coversDefaultClass \Vanderlee\Sentence\Multibyte
+ */
+class MultibyteTest extends PHPUnit_Framework_TestCase
 {
 
     /**
@@ -16,6 +20,9 @@ class MultibyteTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, Multibyte::split($pattern, $subject, $limit, $flags));
     }
 
+    /**
+     * @return array[]
+     */
     public function dataSplit()
     {
         return [
@@ -26,6 +33,35 @@ class MultibyteTest extends \PHPUnit_Framework_TestCase
             [['a-b-c'], '-', 'a-b-c', 1],
             [['a', 'b', 'c'], '-', 'a-b-c', -1, PREG_SPLIT_DELIM_CAPTURE],
             [['a', '-', 'b', '-', 'c'], '(-)', 'a-b-c', -1, PREG_SPLIT_DELIM_CAPTURE],
+        ];
+    }
+
+    /**
+     * @covers ::
+     *
+     * @dataProvider dataTrim
+     * @param $subject
+     * @param $expected
+     * @return void
+     */
+    public function testTrim($subject, $expected=null)
+    {
+        if ($expected === null) {
+            $expected = $subject;
+        }
+        $this->assertSame($expected, Multibyte::trim($subject));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function dataTrim()
+    {
+        return [
+            ['Foo bar', 'Foo bar'],
+            [' Foo bar', 'Foo bar'],
+            [' Foo bar ', 'Foo bar'],
+            ['Foo bar ', 'Foo bar'],
         ];
     }
 }

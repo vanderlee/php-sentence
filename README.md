@@ -4,9 +4,9 @@ Sentence
 [![Build Status](https://travis-ci.org/vanderlee/php-sentence.svg?branch=master)](https://travis-ci.org/vanderlee/PHPSwaggerGen)
 [![Quality](https://scrutinizer-ci.com/g/vanderlee/php-sentence/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/vanderlee/PHPSwaggerGen)
 
-Version 1.0.7
+Version 1.0.8
 
-Copyright &copy; 2016-2022 Martijn van der Lee (@vanderlee), parts copyright &copy; 2017 @marktaw.
+Copyright &copy; 2016-2024 Martijn van der Lee (@vanderlee), parts copyright &copy; 2017 @marktaw.
 
 MIT Open Source license applies.
 

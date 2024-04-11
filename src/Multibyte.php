@@ -56,7 +56,7 @@ class Multibyte
      */
     public static function trim($string)
     {
-        return mb_ereg_replace('^\s*([\s\S]*?)\s*$', '\1', $string);
+        return mb_ereg_replace('(^\s*)|(\s*$)', '', $string);
     }
 
     /**

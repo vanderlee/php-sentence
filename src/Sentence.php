@@ -7,8 +7,8 @@ namespace Vanderlee\Sentence;
  * Clipping may not be perfect.
  * Sentence count should be VERY close to the truth.
  *
- * Multibyte.php safe (atleast for UTF-8), but rules based on germanic
- * language stucture (English, Dutch, German). Should work for most
+ * Multibyte.php safe (at least for UTF-8), but rules based on germanic
+ * language structure (English, Dutch, German). Should work for most
  * latin-alphabet languages.
  *
  * @author Martijn van der Lee (@vanderlee)
@@ -50,7 +50,7 @@ class Sentence
      *
      * @return string
      */
-    private function getReplaceCode(int $index)
+    private function getReplaceCode($index)
     {
         return 0x02 . $index . 0x03;
     }
@@ -62,8 +62,9 @@ class Sentence
      *
      * @return string
      */
-    private function replaceFloatNumbers(string $text)
+    private function replaceFloatNumbers($text)
     {
+        $matches = array();
         preg_match_all('!\d+(?:\.\d+)?!', $text, $matches, PREG_OFFSET_CAPTURE);
 
         $this->replacements = [];
@@ -133,7 +134,7 @@ class Sentence
      * Splits an array of lines by (consecutive sequences of)
      * terminals, keeping terminals.
      *
-     * Multibyte.php safe (atleast for UTF-8)
+     * Multibyte.php safe (at least for UTF-8)
      *
      * For example:
      *    "There ... is. More!"
@@ -172,7 +173,7 @@ class Sentence
      * Appends each terminal item after it's preceding
      * non-terminals.
      *
-     * Multibyte.php safe (atleast for UTF-8)
+     * Multibyte.php safe (at least for UTF-8)
      *
      * For example:
      *    [ "There ", "...", " is", ".", " More", "!" ]
@@ -238,7 +239,7 @@ class Sentence
         $previous_is_abbreviation = false;
         $i = 0;
         foreach ($fragments as $fragment) {
-            $is_abbreviation = self::isAbreviation($fragment);
+            $is_abbreviation = self::isAbbreviation($fragment);
 
             // merge previous fragment with this
             if ($previous_is_abbreviation) {
@@ -265,7 +266,7 @@ class Sentence
      *
      * @return bool
      */
-    private static function isAbreviation($fragment)
+    private static function isAbbreviation($fragment)
     {
         $words = mb_split('\s+', Multibyte::trim($fragment));
 
@@ -290,17 +291,17 @@ class Sentence
      */
     private function parenthesesMerge($parts)
     {
-        $subsentences = [];
+        $subSentences = [];
 
         foreach ($parts as $part) {
-            if ($part[0] === ')' && !empty($subsentences)) {
-                $subsentences[count($subsentences) - 1] .= $part;
+            if ($part[0] === ')' && !empty($subSentences)) {
+                $subSentences[count($subSentences) - 1] .= $part;
             } else {
-                $subsentences[] = $part;
+                $subSentences[] = $part;
             }
         }
 
-        return $subsentences;
+        return $subSentences;
     }
 
     /**
@@ -396,7 +397,7 @@ class Sentence
     }
 
     /**
-     * Return the sentences sentences detected in the provided text.
+     * Return the sentences detected in the provided text.
      * Set the Sentence::SPLIT_TRIM flag to trim whitespace.
      *
      * @param string  $text

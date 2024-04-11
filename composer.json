@@ -1,6 +1,6 @@
 {
   "name": "vanderlee/php-sentence",
-  "description": "Simple text sentence splitting and counting. Supports atleast english, german and dutch, possibly more.",
+  "description": "Simple text sentence splitting and counting. Supports at least english, german and dutch, possibly more.",
   "type": "library",
   "keywords": [
     "sentence",

@@ -6,7 +6,7 @@ use PHPUnit_Framework_TestCase;
 use Vanderlee\Sentence\Sentence;
 
 /**
- * @coversDefaultClass \Vanderlee\Sentence\Sentence
+ * @coversDefaultClass Sentence
  */
 class SentenceTest extends PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new \Vanderlee\Sentence\Sentence();
+        $this->object = new Sentence();
     }
 
     /**
@@ -90,7 +90,7 @@ class SentenceTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::count
      */
-    public function testCountAbreviations()
+    public function testCountAbbreviations()
     {
         $this->assertSame(1, $this->object->count("Hello mr. Smith."));
         $this->assertSame(1, $this->object->count("Hello, OMG Kittens!"));
@@ -190,9 +190,8 @@ class SentenceTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::split
      */
-    public function testSplitAbreviations()
+    public function testSplitAbbreviations()
     {
-//		$this->markTestIncomplete('This test has not been implemented yet.');
         $this->assertSame(['Hello mr. Smith.'], $this->object->split("Hello mr. Smith."));
         $this->assertSame(['Hello, OMG Kittens!'], $this->object->split("Hello, OMG Kittens!"));
         $this->assertSame(['Hello, abbrev. Kittens!'], $this->object->split("Hello, abbrev. Kittens!"));
@@ -237,11 +236,12 @@ class SentenceTest extends PHPUnit_Framework_TestCase
         $this->assertSame(1, $this->object->count("The price is 25.50, including postage and packing."));
         $this->assertSame(1, $this->object->count("I went true to size at 10.5 cms."));
         $this->assertSame(2, $this->object->count("The prices are ￡25.50 or ￡27.50, including postage and packing. I went true to size at 10.5 cms."));
+        $this->assertSame(1, $this->object->count("Prices will go up for 8.6% and because of that it is expensive."));
     }
 
     /**
-     * @covers ::floatNumberClean
-     * @covers ::floatNumberRevert
+     * @covers ::replaceFloatNumbers
+     * @covers ::restoreReplacements
      *
      * @dataProvider dataSplit
      *
@@ -250,7 +250,7 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function testSplit(array $expected, string $text)
+    public function testSplit($expected, $text)
     {
         $this->assertSame($expected, $this->object->split($text));
         $this->assertSame(count($expected), $this->object->count($text));

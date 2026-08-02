@@ -1,7 +1,7 @@
 Sentence
 ========
 [![License](https://img.shields.io/github/license/vanderlee/php-sentence.svg)]()
-[![Build Status](https://travis-ci.org/vanderlee/php-sentence.svg?branch=master)](https://travis-ci.org/vanderlee/php-sentence)
+[![Tests](https://github.com/vanderlee/php-sentence/actions/workflows/tests.yml/badge.svg)](https://github.com/vanderlee/php-sentence/actions/workflows/tests.yml)
 [![Quality](https://scrutinizer-ci.com/g/vanderlee/php-sentence/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/vanderlee/php-sentence)
 
 Version 1.0.8

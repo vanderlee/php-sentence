@@ -52,7 +52,7 @@ class Sentence
      */
     private function getReplaceCode($index)
     {
-        return 0x02 . $index . 0x03;
+        return "\x02" . $index . "\x03";
     }
 
     /**

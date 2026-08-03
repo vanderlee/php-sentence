@@ -49,14 +49,16 @@ class Multibyte
     }
 
     /**
-     * Multibyte.php safe version of standard trim() function.
+     * Multibyte-safe version of standard trim() function.
      *
      * @param string $string
      * @return string
      */
     public static function trim($string)
     {
-        return mb_ereg_replace('(^\s*)|(\s*$)', '', $string);
+        $trimmed = preg_replace('/^[\p{Z}\s]+|[\p{Z}\s]+$/u', '', $string);
+
+        return $trimmed === null ? trim($string) : $trimmed;
     }
 
     /**

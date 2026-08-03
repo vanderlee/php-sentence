@@ -29,39 +29,61 @@ new = """    private static function isAbbreviation($fragment)
 
         $token = mb_substr($lastWord, 0, -1);
         $known = [
-            'dr', 'e.g', 'etc', 'i.e', 'jr', 'mr', 'mrs', 'ms', 'no',
-            'prof', 'sr', 'st', 'vs',
+            'abbrev', 'dr', 'e.g', 'etc', 'i.e', 'jr', 'mr', 'mrs', 'ms',
+            'no', 'prof', 'sr', 'st', 'vs',
         ];
+        $isListMarker = count($words) === 1
+            && (preg_match('#^[ivxlcdm]+$#i', $token) > 0
+                || preg_match('#^\\d+$#', $token) > 0);
 
         return in_array(mb_strtolower($token, 'UTF-8'), $known, true)
             || preg_match('#^\\p{L}$#u', $token) > 0
             || preg_match('#^(?:\\p{L}\\.){2,}$#u', $lastWord) > 0
-            || preg_match('#^[ivxlcdm]+$#i', $token) > 0
-            || preg_match('#^\\d+$#', $token) > 0;
+            || $isListMarker;
     }
 """
 if text.count(old) != 1:
     raise SystemExit('Expected abbreviation method exactly once')
 text = text.replace(old, new, 1)
 
-old = """            $word_count = count(mb_split('\\s+', Multibyte::trim($short)));
+old = """        $sentence = '';
+        $has_words = false;
+        $previous_word_ending = null;
+        foreach ($shorts as $short) {
+            $word_count = count(mb_split('\\s+', Multibyte::trim($short)));
             $after_non_abbreviating_terminal = in_array($previous_word_ending, $non_abbreviating_terminals);
 
             if ($after_non_abbreviating_terminal
                 || ($has_words && $word_count > 1)) {
 """
-new = """            $word_count = count(mb_split('\\s+', Multibyte::trim($short)));
+new = """        $sentence = '';
+        $has_words = false;
+        $previous_word_ending = null;
+        $previous_is_single_period = false;
+        foreach ($shorts as $short) {
+            $word_count = count(mb_split('\\s+', Multibyte::trim($short)));
             $after_non_abbreviating_terminal = in_array($previous_word_ending, $non_abbreviating_terminals);
-            $after_single_word_period = $previous_word_ending === '.'
-                && !$has_words
-                && $sentence !== '';
 
             if ($after_non_abbreviating_terminal
-                || $after_single_word_period
+                || $previous_is_single_period
                 || ($has_words && $word_count > 1)) {
 """
 if text.count(old) != 1:
-    raise SystemExit('Expected sentence merge anchor exactly once')
+    raise SystemExit('Expected sentence merge start exactly once')
+text = text.replace(old, new, 1)
+
+old = """            $sentence .= $short;
+            $previous_word_ending = mb_substr($short, -1);
+"""
+new = """            $sentence .= $short;
+            $previous_word_ending = mb_substr($short, -1);
+            $previous_is_single_period = preg_match(
+                '#(?<!\\.)\\.$#u',
+                Multibyte::trim($short)
+            ) > 0;
+"""
+if text.count(old) != 1:
+    raise SystemExit('Expected sentence merge state update exactly once')
 source.write_text(text.replace(old, new, 1), encoding='utf-8')
 
 tests = Path('tests/SentenceTest.php')

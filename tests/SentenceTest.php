@@ -301,4 +301,25 @@ class SentenceTest extends PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @covers ::split
+     * @covers ::isAbbreviation
+     */
+    public function testSplitLowercaseInitialAbbreviations()
+    {
+        $this->assertSame(
+            ['I get up at 7 a.m. every day.'],
+            $this->object->split('I get up at 7 a.m. every day.')
+        );
+        $this->assertSame(
+            ["Let's meet at 10:00 a.m..", ' How about Greg?'],
+            $this->object->split("Let's meet at 10:00 a.m.. How about Greg?")
+        );
+        $this->assertSame(
+            ["Let's meet at 10:00 A.M..", ' How about Greg?'],
+            $this->object->split("Let's meet at 10:00 A.M.. How about Greg?")
+        );
+    }
+
 }

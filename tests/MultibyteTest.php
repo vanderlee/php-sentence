@@ -37,14 +37,14 @@ class MultibyteTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::
+     * @covers ::trim
      *
      * @dataProvider dataTrim
-     * @param $subject
-     * @param $expected
+     * @param string $subject
+     * @param string|null $expected
      * @return void
      */
-    public function testTrim($subject, $expected=null)
+    public function testTrim($subject, $expected = null)
     {
         if ($expected === null) {
             $expected = $subject;
@@ -62,6 +62,17 @@ class MultibyteTest extends PHPUnit_Framework_TestCase
             [' Foo bar', 'Foo bar'],
             [' Foo bar ', 'Foo bar'],
             ['Foo bar ', 'Foo bar'],
+            ["\xC2\xA0Foo bar\xC2\xA0", 'Foo bar'],
         ];
+    }
+
+    /**
+     * @covers ::trim
+     */
+    public function testTrimHandlesLongInputWithoutMbRegexRetryFailure()
+    {
+        $subject = str_repeat(' ', 100000) . 'Foo bar' . str_repeat(' ', 100000);
+
+        $this->assertSame('Foo bar', Multibyte::trim($subject));
     }
 }

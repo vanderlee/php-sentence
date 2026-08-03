@@ -10,22 +10,12 @@ use Vanderlee\Sentence\Sentence;
  */
 class SentenceTest extends PHPUnit_Framework_TestCase
 {
-
     /**
-     * @var Sentence
+     * @return Sentence
      */
-    protected $object;
-
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    /**
-     * @before
-     */
-    protected function setUpFixture()
+    private function sentence()
     {
-        $this->object = new Sentence();
+        return new Sentence();
     }
 
     /**
@@ -33,9 +23,9 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testCountEmpty()
     {
-        $this->assertSame(0, $this->object->count(''));
-        $this->assertSame(0, $this->object->count(' '));
-        $this->assertSame(0, $this->object->count("\n"));
+        $this->assertSame(0, $this->sentence()->count(''));
+        $this->assertSame(0, $this->sentence()->count(' '));
+        $this->assertSame(0, $this->sentence()->count("\n"));
     }
 
     /**
@@ -43,12 +33,12 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testCountWord()
     {
-        $this->assertSame(1, $this->object->count('Hello'));
-        $this->assertSame(1, $this->object->count('Hello.'));
-        $this->assertSame(1, $this->object->count('Hello...'));
-        $this->assertSame(1, $this->object->count('Hello!'));
-        $this->assertSame(1, $this->object->count('Hello?'));
-        $this->assertSame(1, $this->object->count('Hello?!'));
+        $this->assertSame(1, $this->sentence()->count('Hello'));
+        $this->assertSame(1, $this->sentence()->count('Hello.'));
+        $this->assertSame(1, $this->sentence()->count('Hello...'));
+        $this->assertSame(1, $this->sentence()->count('Hello!'));
+        $this->assertSame(1, $this->sentence()->count('Hello?'));
+        $this->assertSame(1, $this->sentence()->count('Hello?!'));
     }
 
     /**
@@ -56,12 +46,12 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testCountTwoWords()
     {
-        $this->assertSame(1, $this->object->count('Hello world'));
-        $this->assertSame(1, $this->object->count('Hello world.'));
-        $this->assertSame(1, $this->object->count('Hello world...'));
-        $this->assertSame(1, $this->object->count('Hello world!'));
-        $this->assertSame(1, $this->object->count('Hello world?'));
-        $this->assertSame(1, $this->object->count('Hello world?!'));
+        $this->assertSame(1, $this->sentence()->count('Hello world'));
+        $this->assertSame(1, $this->sentence()->count('Hello world.'));
+        $this->assertSame(1, $this->sentence()->count('Hello world...'));
+        $this->assertSame(1, $this->sentence()->count('Hello world!'));
+        $this->assertSame(1, $this->sentence()->count('Hello world?'));
+        $this->assertSame(1, $this->sentence()->count('Hello world?!'));
     }
 
     /**
@@ -69,11 +59,11 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testCountMultipleWords()
     {
-        $this->assertSame(2, $this->object->count('Hello world. Are you there'));
-        $this->assertSame(2, $this->object->count('Hello world. Are you there?'));
-        $this->assertSame(1, $this->object->count('Hello world, Are you there?'));
-        $this->assertSame(1, $this->object->count('Hello world: Are you there?'));
-        $this->assertSame(1, $this->object->count('Hello world... Are you there?'));
+        $this->assertSame(2, $this->sentence()->count('Hello world. Are you there'));
+        $this->assertSame(2, $this->sentence()->count('Hello world. Are you there?'));
+        $this->assertSame(1, $this->sentence()->count('Hello world, Are you there?'));
+        $this->assertSame(1, $this->sentence()->count('Hello world: Are you there?'));
+        $this->assertSame(1, $this->sentence()->count('Hello world... Are you there?'));
     }
 
     /**
@@ -81,13 +71,13 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testCountLinebreaks()
     {
-        $this->assertSame(2, $this->object->count("Hello world...\rAre you there?"));
-        $this->assertSame(2, $this->object->count("Hello world...\nAre you there?"));
-        $this->assertSame(2, $this->object->count("Hello world...\r\nAre you there?"));
-        $this->assertSame(2, $this->object->count("Hello world...\r\n\rAre you there?"));
-        $this->assertSame(2, $this->object->count("Hello world...\n\r\nAre you there?"));
-        $this->assertSame(2, $this->object->count("Hello world...\n\nAre you there?"));
-        $this->assertSame(2, $this->object->count("Hello world...\r\rAre you there?"));
+        $this->assertSame(2, $this->sentence()->count("Hello world...\rAre you there?"));
+        $this->assertSame(2, $this->sentence()->count("Hello world...\nAre you there?"));
+        $this->assertSame(2, $this->sentence()->count("Hello world...\r\nAre you there?"));
+        $this->assertSame(2, $this->sentence()->count("Hello world...\r\n\rAre you there?"));
+        $this->assertSame(2, $this->sentence()->count("Hello world...\n\r\nAre you there?"));
+        $this->assertSame(2, $this->sentence()->count("Hello world...\n\nAre you there?"));
+        $this->assertSame(2, $this->sentence()->count("Hello world...\r\rAre you there?"));
     }
 
     /**
@@ -95,12 +85,12 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testCountAbbreviations()
     {
-        $this->assertSame(1, $this->object->count("Hello mr. Smith."));
-        $this->assertSame(1, $this->object->count("Hello, OMG Kittens!"));
-        $this->assertSame(1, $this->object->count("Hello, abbrev. Kittens!"));
-        $this->assertSame(1, $this->object->count("Hello, O.M.G. Kittens!"));
-        $this->assertSame(1, $this->object->count("Last week, former director of the A.B.C. John B. Smith was fired."));
-        $this->assertSame(1, $this->object->count("Mr. Smith was not available for comment.."));
+        $this->assertSame(1, $this->sentence()->count("Hello mr. Smith."));
+        $this->assertSame(1, $this->sentence()->count("Hello, OMG Kittens!"));
+        $this->assertSame(1, $this->sentence()->count("Hello, abbrev. Kittens!"));
+        $this->assertSame(1, $this->sentence()->count("Hello, O.M.G. Kittens!"));
+        $this->assertSame(1, $this->sentence()->count("Last week, former director of the A.B.C. John B. Smith was fired."));
+        $this->assertSame(1, $this->sentence()->count("Mr. Smith was not available for comment.."));
     }
 
     /**
@@ -108,12 +98,12 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testCountMultiplePunctuation()
     {
-        $this->assertSame(2, $this->object->count("Hello there. Brave new world."));
-        $this->assertSame(1, $this->object->count("Hello there... Brave new world."));
-        $this->assertSame(2, $this->object->count("Hello there?... Brave new world."));
-        $this->assertSame(2, $this->object->count("Hello there!... Brave new world."));
-        $this->assertSame(2, $this->object->count("Hello there!!! Brave new world."));
-        $this->assertSame(2, $this->object->count("Hello there??? Brave new world."));
+        $this->assertSame(2, $this->sentence()->count("Hello there. Brave new world."));
+        $this->assertSame(1, $this->sentence()->count("Hello there... Brave new world."));
+        $this->assertSame(2, $this->sentence()->count("Hello there?... Brave new world."));
+        $this->assertSame(2, $this->sentence()->count("Hello there!... Brave new world."));
+        $this->assertSame(2, $this->sentence()->count("Hello there!!! Brave new world."));
+        $this->assertSame(2, $this->sentence()->count("Hello there??? Brave new world."));
     }
 
     /**
@@ -121,12 +111,12 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testCountOneWordSentences()
     {
-        $this->assertSame(2, $this->object->count("You? Smith?"));
-        $this->assertSame(2, $this->object->count("You there? Smith?"));
-        $this->assertSame(1, $this->object->count("You mr. Smith?"));
-        $this->assertSame(2, $this->object->count("Are you there. Mister Smith?"));
-        $this->assertSame(2, $this->object->count("Are you there. Smith, sir?"));
-        $this->assertSame(2, $this->object->count("Are you there. Mr. Smith?"));
+        $this->assertSame(2, $this->sentence()->count("You? Smith?"));
+        $this->assertSame(2, $this->sentence()->count("You there? Smith?"));
+        $this->assertSame(1, $this->sentence()->count("You mr. Smith?"));
+        $this->assertSame(2, $this->sentence()->count("Are you there. Mister Smith?"));
+        $this->assertSame(2, $this->sentence()->count("Are you there. Smith, sir?"));
+        $this->assertSame(2, $this->sentence()->count("Are you there. Mr. Smith?"));
     }
 
     /**
@@ -134,9 +124,9 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testSplitEmpty()
     {
-        $this->assertSame([], $this->object->split(''));
-        $this->assertSame([], $this->object->split(' '));
-        $this->assertSame([], $this->object->split("\n"));
+        $this->assertSame([], $this->sentence()->split(''));
+        $this->assertSame([], $this->sentence()->split(' '));
+        $this->assertSame([], $this->sentence()->split("\n"));
     }
 
     /**
@@ -144,8 +134,8 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testCleanupUnicode()
     {
-        $this->assertSame(['Fix "these" quotes'], $this->object->split('Fix "these" quotes'));
-        $this->assertSame(['Fix "these" quotes'], $this->object->split("Fix \xC2\xABthese\xC2\xAB quotes"));
+        $this->assertSame(['Fix "these" quotes'], $this->sentence()->split('Fix "these" quotes'));
+        $this->assertSame(['Fix "these" quotes'], $this->sentence()->split("Fix \xC2\xABthese\xC2\xAB quotes"));
     }
 
     /**
@@ -153,12 +143,12 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testSplitWord()
     {
-        $this->assertSame(['Hello'], $this->object->split('Hello'));
-        $this->assertSame(['Hello.'], $this->object->split('Hello.'));
-        $this->assertSame(['Hello...'], $this->object->split('Hello...'));
-        $this->assertSame(['Hello!'], $this->object->split('Hello!'));
-        $this->assertSame(['Hello?'], $this->object->split('Hello?'));
-        $this->assertSame(['Hello?!'], $this->object->split('Hello?!'));
+        $this->assertSame(['Hello'], $this->sentence()->split('Hello'));
+        $this->assertSame(['Hello.'], $this->sentence()->split('Hello.'));
+        $this->assertSame(['Hello...'], $this->sentence()->split('Hello...'));
+        $this->assertSame(['Hello!'], $this->sentence()->split('Hello!'));
+        $this->assertSame(['Hello?'], $this->sentence()->split('Hello?'));
+        $this->assertSame(['Hello?!'], $this->sentence()->split('Hello?!'));
     }
 
     /**
@@ -166,13 +156,13 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testSplitMultipleWords()
     {
-        $this->assertSame(['Hello world.', ' Are you there'], $this->object->split('Hello world. Are you there'));
-        $this->assertSame(['Hello world.', ' Are you there?'], $this->object->split('Hello world. Are you there?'));
-        $this->assertSame(['Hello world.', 'Are you there'], $this->object->split('Hello world. Are you there', Sentence::SPLIT_TRIM));
-        $this->assertSame(['Hello world.', 'Are you there?'], $this->object->split('Hello world. Are you there?', Sentence::SPLIT_TRIM));
-        $this->assertSame(['Hello world, Are you there?'], $this->object->split('Hello world, Are you there?'));
-        $this->assertSame(['Hello world: Are you there?'], $this->object->split('Hello world: Are you there?'));
-        $this->assertSame(['Hello world... Are you there?'], $this->object->split('Hello world... Are you there?'));
+        $this->assertSame(['Hello world.', ' Are you there'], $this->sentence()->split('Hello world. Are you there'));
+        $this->assertSame(['Hello world.', ' Are you there?'], $this->sentence()->split('Hello world. Are you there?'));
+        $this->assertSame(['Hello world.', 'Are you there'], $this->sentence()->split('Hello world. Are you there', Sentence::SPLIT_TRIM));
+        $this->assertSame(['Hello world.', 'Are you there?'], $this->sentence()->split('Hello world. Are you there?', Sentence::SPLIT_TRIM));
+        $this->assertSame(['Hello world, Are you there?'], $this->sentence()->split('Hello world, Are you there?'));
+        $this->assertSame(['Hello world: Are you there?'], $this->sentence()->split('Hello world: Are you there?'));
+        $this->assertSame(['Hello world... Are you there?'], $this->sentence()->split('Hello world... Are you there?'));
     }
 
     /**
@@ -180,14 +170,14 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testSplitLinebreaks()
     {
-        $this->assertSame(["Hello world...\r", "Are you there?"], $this->object->split("Hello world...\rAre you there?"));
-        $this->assertSame(["Hello world...\n", " Are you there?"], $this->object->split("Hello world...\n Are you there?"));
-        $this->assertSame(["Hello world...\n", "Are you there?"], $this->object->split("Hello world...\nAre you there?"));
-        $this->assertSame(["Hello world...\r\n", "Are you there?"], $this->object->split("Hello world...\r\nAre you there?"));
-        $this->assertSame(["Hello world...\r\n\r", "Are you there?"], $this->object->split("Hello world...\r\n\rAre you there?"));
-        $this->assertSame(["Hello world...\n\r\n", "Are you there?"], $this->object->split("Hello world...\n\r\nAre you there?"));
-        $this->assertSame(["Hello world...\n\n", "Are you there?"], $this->object->split("Hello world...\n\nAre you there?"));
-        $this->assertSame(["Hello world...\r\r", "Are you there?"], $this->object->split("Hello world...\r\rAre you there?"));
+        $this->assertSame(["Hello world...\r", "Are you there?"], $this->sentence()->split("Hello world...\rAre you there?"));
+        $this->assertSame(["Hello world...\n", " Are you there?"], $this->sentence()->split("Hello world...\n Are you there?"));
+        $this->assertSame(["Hello world...\n", "Are you there?"], $this->sentence()->split("Hello world...\nAre you there?"));
+        $this->assertSame(["Hello world...\r\n", "Are you there?"], $this->sentence()->split("Hello world...\r\nAre you there?"));
+        $this->assertSame(["Hello world...\r\n\r", "Are you there?"], $this->sentence()->split("Hello world...\r\n\rAre you there?"));
+        $this->assertSame(["Hello world...\n\r\n", "Are you there?"], $this->sentence()->split("Hello world...\n\r\nAre you there?"));
+        $this->assertSame(["Hello world...\n\n", "Are you there?"], $this->sentence()->split("Hello world...\n\nAre you there?"));
+        $this->assertSame(["Hello world...\r\r", "Are you there?"], $this->sentence()->split("Hello world...\r\rAre you there?"));
     }
 
     /**
@@ -195,13 +185,13 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testSplitAbbreviations()
     {
-        $this->assertSame(['Hello mr. Smith.'], $this->object->split("Hello mr. Smith."));
-        $this->assertSame(['Hello, OMG Kittens!'], $this->object->split("Hello, OMG Kittens!"));
-        $this->assertSame(['Hello, abbrev. Kittens!'], $this->object->split("Hello, abbrev. Kittens!"));
-        $this->assertSame(['Hello, O.M.G. Kittens!'], $this->object->split("Hello, O.M.G. Kittens!"));
-        $this->assertSame(['Last week, former director of the A.B.C. John B. Smith was fired.'], $this->object->split("Last week, former director of the A.B.C. John B. Smith was fired."));
-        $this->assertSame(['Mr. Smith was not available for comment..'], $this->object->split("Mr. Smith was not available for comment.."));
-        $this->assertSame(['Hello mr. Smith.', ' Are you there?'], $this->object->split("Hello mr. Smith. Are you there?"));
+        $this->assertSame(['Hello mr. Smith.'], $this->sentence()->split("Hello mr. Smith."));
+        $this->assertSame(['Hello, OMG Kittens!'], $this->sentence()->split("Hello, OMG Kittens!"));
+        $this->assertSame(['Hello, abbrev. Kittens!'], $this->sentence()->split("Hello, abbrev. Kittens!"));
+        $this->assertSame(['Hello, O.M.G. Kittens!'], $this->sentence()->split("Hello, O.M.G. Kittens!"));
+        $this->assertSame(['Last week, former director of the A.B.C. John B. Smith was fired.'], $this->sentence()->split("Last week, former director of the A.B.C. John B. Smith was fired."));
+        $this->assertSame(['Mr. Smith was not available for comment..'], $this->sentence()->split("Mr. Smith was not available for comment.."));
+        $this->assertSame(['Hello mr. Smith.', ' Are you there?'], $this->sentence()->split("Hello mr. Smith. Are you there?"));
     }
 
     /**
@@ -209,12 +199,12 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testSplitOneWordSentences()
     {
-        $this->assertSame(["You?", " Smith?"], $this->object->split("You? Smith?"));
-        $this->assertSame(["You there?", " Smith?"], $this->object->split("You there? Smith?"));
-        $this->assertSame(["You mr. Smith?"], $this->object->split("You mr. Smith?"));
-        $this->assertSame(["Are you there.", " Mister Smith?"], $this->object->split("Are you there. Mister Smith?"));
-        $this->assertSame(["Are you there.", " Smith, sir?"], $this->object->split("Are you there. Smith, sir?"));
-        $this->assertSame(["Are you there.", " Mr. Smith?"], $this->object->split("Are you there. Mr. Smith?"));
+        $this->assertSame(["You?", " Smith?"], $this->sentence()->split("You? Smith?"));
+        $this->assertSame(["You there?", " Smith?"], $this->sentence()->split("You there? Smith?"));
+        $this->assertSame(["You mr. Smith?"], $this->sentence()->split("You mr. Smith?"));
+        $this->assertSame(["Are you there.", " Mister Smith?"], $this->sentence()->split("Are you there. Mister Smith?"));
+        $this->assertSame(["Are you there.", " Smith, sir?"], $this->sentence()->split("Are you there. Smith, sir?"));
+        $this->assertSame(["Are you there.", " Mr. Smith?"], $this->sentence()->split("Are you there. Mr. Smith?"));
     }
 
     /**
@@ -222,12 +212,12 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testSplitParenthesis()
     {
-        $this->assertSame(["You there (not here!).", " Mister Smith"], $this->object->split("You there (not here!). Mister Smith"));
-        $this->assertSame(["You (not him!) here.", " Mister Smith"], $this->object->split("You (not him!) here. Mister Smith"));
-        $this->assertSame(["(What!) you here.", " Mister Smith"], $this->object->split("(What!) you here. Mister Smith"));
-        $this->assertSame(["You there (not here).", " Mister Smith"], $this->object->split("You there (not here). Mister Smith"));
-        $this->assertSame(["You (not him) here.", " Mister Smith"], $this->object->split("You (not him) here. Mister Smith"));
-        $this->assertSame(["(What) you here.", " Mister Smith"], $this->object->split("(What) you here. Mister Smith"));
+        $this->assertSame(["You there (not here!).", " Mister Smith"], $this->sentence()->split("You there (not here!). Mister Smith"));
+        $this->assertSame(["You (not him!) here.", " Mister Smith"], $this->sentence()->split("You (not him!) here. Mister Smith"));
+        $this->assertSame(["(What!) you here.", " Mister Smith"], $this->sentence()->split("(What!) you here. Mister Smith"));
+        $this->assertSame(["You there (not here).", " Mister Smith"], $this->sentence()->split("You there (not here). Mister Smith"));
+        $this->assertSame(["You (not him) here.", " Mister Smith"], $this->sentence()->split("You (not him) here. Mister Smith"));
+        $this->assertSame(["(What) you here.", " Mister Smith"], $this->sentence()->split("(What) you here. Mister Smith"));
     }
 
     /**
@@ -235,11 +225,11 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testSentenceWithNumericValues()
     {
-        $this->assertSame(1, $this->object->count("The price is ￡25.50, including postage and packing."));
-        $this->assertSame(1, $this->object->count("The price is 25.50, including postage and packing."));
-        $this->assertSame(1, $this->object->count("I went true to size at 10.5 cms."));
-        $this->assertSame(2, $this->object->count("The prices are ￡25.50 or ￡27.50, including postage and packing. I went true to size at 10.5 cms."));
-        $this->assertSame(1, $this->object->count("Prices will go up for 8.6% and because of that it is expensive."));
+        $this->assertSame(1, $this->sentence()->count("The price is ￡25.50, including postage and packing."));
+        $this->assertSame(1, $this->sentence()->count("The price is 25.50, including postage and packing."));
+        $this->assertSame(1, $this->sentence()->count("I went true to size at 10.5 cms."));
+        $this->assertSame(2, $this->sentence()->count("The prices are ￡25.50 or ￡27.50, including postage and packing. I went true to size at 10.5 cms."));
+        $this->assertSame(1, $this->sentence()->count("Prices will go up for 8.6% and because of that it is expensive."));
     }
 
     /**
@@ -255,8 +245,8 @@ class SentenceTest extends PHPUnit_Framework_TestCase
      */
     public function testSplit($expected, $text)
     {
-        $this->assertSame($expected, $this->object->split($text));
-        $this->assertSame(count($expected), $this->object->count($text));
+        $this->assertSame($expected, $this->sentence()->split($text));
+        $this->assertSame(count($expected), $this->sentence()->count($text));
     }
 
     public function dataSplit()

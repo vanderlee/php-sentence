@@ -1,9 +1,9 @@
 name: Apply abbreviation parsing fix
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/fix-abbreviation-initials
+      - agent/modernize-test-matrix
 
 permissions:
   contents: write

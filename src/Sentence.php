@@ -269,16 +269,25 @@ class Sentence
     private static function isAbbreviation($fragment)
     {
         $words = mb_split('\s+', Multibyte::trim($fragment));
+        $lastWord = Multibyte::trim($words[count($words) - 1]);
 
-        $word_count = count($words);
+        if (mb_substr($lastWord, -1) !== '.') {
+            return false;
+        }
 
-        $last_word = Multibyte::trim($words[$word_count - 1]);
-        $last_is_capital = preg_match('#^\p{Lu}#u', $last_word);
-        $last_is_abbreviation = mb_substr(Multibyte::trim($fragment), -1) === '.';
+        $token = mb_substr($lastWord, 0, -1);
+        $known = [
+            'abbrev', 'dr', 'e.g', 'etc', 'i.e', 'jr', 'mr', 'mrs', 'ms',
+            'no', 'prof', 'sr', 'st', 'vs',
+        ];
+        $isListMarker = count($words) === 1
+            && (preg_match('#^[ivxlcdm]+$#i', $token) > 0
+                || preg_match('#^\d+$#', $token) > 0);
 
-        return $last_is_capital > 0
-            && $last_is_abbreviation > 0
-            && mb_strlen($last_word) <= 3;
+        return in_array(mb_strtolower($token, 'UTF-8'), $known, true)
+            || preg_match('#^\p{L}$#u', $token) > 0
+            || preg_match('#^(?:\p{L}\.){2,}$#u', $lastWord) > 0
+            || $isListMarker;
     }
 
     /**
@@ -369,11 +378,13 @@ class Sentence
         $sentence = '';
         $has_words = false;
         $previous_word_ending = null;
+        $previous_is_single_period = false;
         foreach ($shorts as $short) {
             $word_count = count(mb_split('\s+', Multibyte::trim($short)));
             $after_non_abbreviating_terminal = in_array($previous_word_ending, $non_abbreviating_terminals);
 
             if ($after_non_abbreviating_terminal
+                || $previous_is_single_period
                 || ($has_words && $word_count > 1)) {
 
                 $sentences[] = $sentence;
@@ -387,6 +398,10 @@ class Sentence
 
             $sentence .= $short;
             $previous_word_ending = mb_substr($short, -1);
+            $previous_is_single_period = preg_match(
+                '#(?<!\.)\.$#u',
+                Multibyte::trim($short)
+            ) > 0;
         }
 
         if (!empty($sentence)) {
@@ -451,9 +466,13 @@ class Sentence
      */
     private static function trimSentences($sentences)
     {
-        return array_map(function ($sentence) {
+        $sentences = array_map(function ($sentence) {
             return Multibyte::trim($sentence);
         }, $sentences);
+
+        return array_values(array_filter($sentences, function ($sentence) {
+            return $sentence !== '';
+        }));
     }
 
     /**

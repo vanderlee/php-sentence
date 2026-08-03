@@ -1,0 +1,43 @@
+name: Apply explicit UTF-8 offsets
+
+on:
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/preserve-original-text
+          fetch-depth: 0
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '5.4'
+          extensions: mbstring, ctype
+          tools: composer:2.2
+          coverage: none
+
+      - name: Apply UTF-8 offset patch
+        run: python3 tools/fix-preserve-utf8-offsets.py
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run tests
+        run: composer test
+
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/Sentence.php .github/workflows/apply-preserve-utf8-offsets.yml tools/fix-preserve-utf8-offsets.py
+          git commit -m "Use explicit UTF-8 sentence offsets"
+          git push origin HEAD:agent/preserve-original-text

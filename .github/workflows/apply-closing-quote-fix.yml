@@ -1,0 +1,77 @@
+name: Apply closing quote punctuation fix
+
+on:
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/fix-closing-quote-punctuation
+          fetch-depth: 0
+
+      - name: Patch quote recognition and tests
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          source_path = Path('src/Sentence.php')
+          source = source_path.read_text(encoding='utf-8')
+          anchor = "$first = mb_substr($statement, 0, 1);"
+          insertion = anchor + "\n        $isClosingQuote = preg_match('/^[\\\'\"][.!?]*$/u', $trimmed) === 1;"
+          if source.count(anchor) != 1:
+              raise SystemExit('Expected quote prefix check exactly once')
+          source = source.replace(anchor, insertion)
+          old_return = "return in_array($trimmed, ['\"', '\\''])"
+          new_return = "return $isClosingQuote\n            || in_array($trimmed, ['\"', '\\''])"
+          if source.count(old_return) != 1:
+              raise SystemExit('Expected quote return exactly once')
+          source_path.write_text(source.replace(old_return, new_return), encoding='utf-8')
+
+          test_path = Path('tests/SentenceTest.php')
+          tests = test_path.read_text(encoding='utf-8')
+          insertion = r'''
+
+    /**
+     * @covers ::split
+     * @covers ::isEndQuote
+     */
+    public function testSplitClosingQuoteWithTerminalPunctuation()
+    {
+        $this->assertSame(
+            ["'Quoted text!'.\n", 'Another line'],
+            $this->object->split("'Quoted text!'.\nAnother line")
+        );
+        $this->assertSame(
+            [
+                'I\'m always asked "Whats the secret to success?".',
+                ' The secret is there is no secret.',
+                ' Be humble, hungry and the hardest.',
+            ],
+            $this->object->split('I\'m always asked "Whats the secret to success?". The secret is there is no secret. Be humble, hungry and the hardest.')
+        );
+    }
+'''
+          closing = tests.rfind('\n}')
+          if closing == -1:
+              raise SystemExit('Could not locate SentenceTest class closing brace')
+          test_path.write_text(tests[:closing] + insertion + tests[closing:], encoding='utf-8')
+
+          Path('.github/workflows/apply-closing-quote-fix.yml').unlink()
+          PY
+
+      - name: Commit patched files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/Sentence.php tests/SentenceTest.php .github/workflows/apply-closing-quote-fix.yml
+          git commit -m "Merge closing quotes with terminal punctuation"
+          git push origin HEAD:agent/fix-closing-quote-punctuation

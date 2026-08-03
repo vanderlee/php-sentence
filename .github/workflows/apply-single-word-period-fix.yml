@@ -25,7 +25,9 @@ jobs:
           coverage: none
 
       - name: Apply exact source patch
-        run: python3 tools/apply-single-word-period-fix.py
+        run: |
+          python3 tools/apply-single-word-period-fix.py
+          python3 tools/filter-empty-trimmed-sentences.py
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
@@ -37,6 +39,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/Sentence.php tests/SentenceTest.php README.md .github/workflows/apply-single-word-period-fix.yml tools/apply-single-word-period-fix.py
+          git add src/Sentence.php tests/SentenceTest.php README.md .github/workflows/apply-single-word-period-fix.yml tools/apply-single-word-period-fix.py tools/filter-empty-trimmed-sentences.py
           git commit -m "Recognize single-word period sentences"
           git push origin HEAD:agent/single-word-period-sentences

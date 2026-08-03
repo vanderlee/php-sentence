@@ -71,7 +71,7 @@ class MultibyteTest extends PHPUnit_Framework_TestCase
      */
     public function testTrimHandlesLongInputWithoutMbRegexRetryFailure()
     {
-        $subject = str_repeat(' ', 100000).'Foo bar'.str_repeat(' ', 100000);
+        $subject = str_repeat(' ', 100000) . 'Foo bar' . str_repeat(' ', 100000);
 
         $this->assertSame('Foo bar', Multibyte::trim($subject));
     }

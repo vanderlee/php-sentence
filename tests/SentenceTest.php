@@ -122,6 +122,8 @@ class SentenceTest extends PHPUnit_Framework_TestCase
     public function testCountOneWordSentences()
     {
         $this->assertSame(2, $this->object->count("You? Smith?"));
+        $this->assertSame(3, $this->object->count("Go. Stop. Wait."));
+        $this->assertSame(3, $this->object->count("See it. Report it. Sorted."));
         $this->assertSame(2, $this->object->count("You there? Smith?"));
         $this->assertSame(1, $this->object->count("You mr. Smith?"));
         $this->assertSame(2, $this->object->count("Are you there. Mister Smith?"));
@@ -210,11 +212,42 @@ class SentenceTest extends PHPUnit_Framework_TestCase
     public function testSplitOneWordSentences()
     {
         $this->assertSame(["You?", " Smith?"], $this->object->split("You? Smith?"));
+        $this->assertSame(["Go.", " Stop.", " Wait."], $this->object->split("Go. Stop. Wait."));
+        $this->assertSame(["See it.", " Report it.", " Sorted."], $this->object->split("See it. Report it. Sorted."));
         $this->assertSame(["You there?", " Smith?"], $this->object->split("You there? Smith?"));
         $this->assertSame(["You mr. Smith?"], $this->object->split("You mr. Smith?"));
         $this->assertSame(["Are you there.", " Mister Smith?"], $this->object->split("Are you there. Mister Smith?"));
         $this->assertSame(["Are you there.", " Smith, sir?"], $this->object->split("Are you there. Smith, sir?"));
         $this->assertSame(["Are you there.", " Mr. Smith?"], $this->object->split("Are you there. Mr. Smith?"));
+    }
+
+    /**
+     * @covers ::split
+     */
+    public function testOrderedListMarkersStayWithTheirItems()
+    {
+        $numeric = "1. Set Lofty Goals.
+2. Visualize Success.
+3. Learn from Others.";
+        $roman = "I. Set Lofty Goals.
+II. Visualize Success.
+XI. Learn from Others.";
+        $letters = "a. Set Lofty Goals.
+b. Visualize Success.
+c. Learn from Others.";
+
+        $this->assertSame(
+            ['1. Set Lofty Goals.', '2. Visualize Success.', '3. Learn from Others.'],
+            $this->object->split($numeric, Sentence::SPLIT_TRIM)
+        );
+        $this->assertSame(
+            ['I. Set Lofty Goals.', 'II. Visualize Success.', 'XI. Learn from Others.'],
+            $this->object->split($roman, Sentence::SPLIT_TRIM)
+        );
+        $this->assertSame(
+            ['a. Set Lofty Goals.', 'b. Visualize Success.', 'c. Learn from Others.'],
+            $this->object->split($letters, Sentence::SPLIT_TRIM)
+        );
     }
 
     /**

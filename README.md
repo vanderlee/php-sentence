@@ -84,7 +84,8 @@ The following is a rough list of the rules used to split sentences.
 -	Each linebreak separates sentences.
 -	The end of the text indicates the end if a sentence if not otherwise ended
 	through proper punctuation.
--	Sentences must be at least two words long, unless a linebreak or end-of-text.
+-	Single-word sentences ending in a period are recognized when the token is not
+	a known abbreviation, an initial, or an ordered-list marker.
 -	An empty line is not a sentence.
 -	Each question- or exclamation mark or combination thereof, is considered
 	the end of a sentence.

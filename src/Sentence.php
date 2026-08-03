@@ -416,7 +416,7 @@ class Sentence
      */
     private static function preserveOriginalText($sentences, $normalized, $original)
     {
-        if (mb_strlen($normalized) !== mb_strlen($original)) {
+        if (mb_strlen($normalized, 'UTF-8') !== mb_strlen($original, 'UTF-8')) {
             return $sentences;
         }
 
@@ -424,13 +424,13 @@ class Sentence
         $offset = 0;
 
         foreach ($sentences as $sentence) {
-            $position = mb_strpos($normalized, $sentence, $offset);
+            $position = mb_strpos($normalized, $sentence, $offset, 'UTF-8');
             if ($position === false) {
                 return $sentences;
             }
 
-            $length = mb_strlen($sentence);
-            $result[] = mb_substr($original, $position, $length);
+            $length = mb_strlen($sentence, 'UTF-8');
+            $result[] = mb_substr($original, $position, $length, 'UTF-8');
             $offset = $position + $length;
         }
 

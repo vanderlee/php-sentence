@@ -23,6 +23,11 @@ class Sentence
     const SPLIT_TRIM = 0x1;
 
     /**
+     * Preserve the original Unicode characters in returned sentences.
+     */
+    const SPLIT_PRESERVE = 0x2;
+
+    /**
      * List of characters used to terminate sentences.
      *
      * @var string[]
@@ -397,6 +402,42 @@ class Sentence
     }
 
     /**
+     * Project normalized sentence boundaries back onto the original text.
+     *
+     * Quote normalization is character-for-character, so offsets remain stable.
+     * If another normalization changes the character count, retain the normalized
+     * output rather than risk returning incorrect slices.
+     *
+     * @param string[] $sentences
+     * @param string   $normalized
+     * @param string   $original
+     *
+     * @return string[]
+     */
+    private static function preserveOriginalText($sentences, $normalized, $original)
+    {
+        if (mb_strlen($normalized) !== mb_strlen($original)) {
+            return $sentences;
+        }
+
+        $result = [];
+        $offset = 0;
+
+        foreach ($sentences as $sentence) {
+            $position = mb_strpos($normalized, $sentence, $offset);
+            if ($position === false) {
+                return $sentences;
+            }
+
+            $length = mb_strlen($sentence);
+            $result[] = mb_substr($original, $position, $length);
+            $offset = $position + $length;
+        }
+
+        return $result;
+    }
+
+    /**
      * Return the sentences detected in the provided text.
      * Set the Sentence::SPLIT_TRIM flag to trim whitespace.
      *
@@ -420,7 +461,9 @@ class Sentence
             ];
         }
 
-        // clean funny quotes
+        $originalText = $text;
+
+        // clean funny quotes for boundary detection
         $text = Multibyte::cleanUnicode($text);
 
         // Split
@@ -435,6 +478,10 @@ class Sentence
         }
 
         // Post process
+        if ($flags & self::SPLIT_PRESERVE) {
+            $sentences = self::preserveOriginalText($sentences, $text, $originalText);
+        }
+
         if ($flags & self::SPLIT_TRIM) {
             return self::trimSentences($sentences);
         }

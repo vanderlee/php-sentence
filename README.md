@@ -40,6 +40,9 @@ Splits the text into sentences.
 
 -	**`Sentence::SPLIT_TRIM`**: Trim whitespace off the left and right sides of
 	each returned sentence.
+-	**`Sentence::SPLIT_PRESERVE`**: Preserve original Unicode quote and
+	apostrophe characters in returned sentences instead of returning their normalized
+	ASCII equivalents. It can be combined with `SPLIT_TRIM` using `|`.
 
 ## Documentation
 You can find documentation generated from the source code by ApiGen here: [ApiGen documentation](doc/)

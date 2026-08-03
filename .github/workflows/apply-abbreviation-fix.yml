@@ -1,0 +1,83 @@
+name: Apply abbreviation parsing fix
+
+on:
+  push:
+    branches:
+      - agent/fix-abbreviation-initials
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/fix-abbreviation-initials
+          fetch-depth: 0
+
+      - name: Patch parser and tests
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          source_path = Path('src/Sentence.php')
+          source = source_path.read_text(encoding='utf-8')
+          old = """        $last_is_capital = preg_match('#^\\p{Lu}#u', $last_word);
+        $last_is_abbreviation = mb_substr(Multibyte::trim($fragment), -1) === '.';
+
+        return $last_is_capital > 0
+            && $last_is_abbreviation > 0
+            && mb_strlen($last_word) <= 3;"""
+          new = """        $last_is_capital = preg_match('#^\\p{Lu}#u', $last_word);
+        $last_is_initial = preg_match('#^\\p{L}\\.$#u', $last_word);
+        $last_is_abbreviation = mb_substr(Multibyte::trim($fragment), -1) === '.';
+
+        return ($last_is_capital > 0 || $last_is_initial > 0)
+            && $last_is_abbreviation > 0
+            && mb_strlen($last_word) <= 3;"""
+          if source.count(old) != 1:
+              raise SystemExit('Expected abbreviation predicate exactly once')
+          source_path.write_text(source.replace(old, new), encoding='utf-8')
+
+          test_path = Path('tests/SentenceTest.php')
+          tests = test_path.read_text(encoding='utf-8')
+          insertion = r'''
+
+    /**
+     * @covers ::split
+     * @covers ::isAbbreviation
+     */
+    public function testSplitLowercaseInitialAbbreviations()
+    {
+        $this->assertSame(
+            ['I get up at 7 a.m. every day.'],
+            $this->object->split('I get up at 7 a.m. every day.')
+        );
+        $this->assertSame(
+            ["Let's meet at 10:00 a.m..", ' How about Greg?'],
+            $this->object->split("Let's meet at 10:00 a.m.. How about Greg?")
+        );
+        $this->assertSame(
+            ["Let's meet at 10:00 A.M..", ' How about Greg?'],
+            $this->object->split("Let's meet at 10:00 A.M.. How about Greg?")
+        );
+    }
+'''
+          closing = tests.rfind('\n}')
+          if closing == -1:
+              raise SystemExit('Could not locate SentenceTest class closing brace')
+          test_path.write_text(tests[:closing] + insertion + tests[closing:], encoding='utf-8')
+
+          Path('.github/workflows/apply-abbreviation-fix.yml').unlink()
+          PY
+
+      - name: Commit patched files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/Sentence.php tests/SentenceTest.php .github/workflows/apply-abbreviation-fix.yml
+          git commit -m "Handle lowercase dotted abbreviations"
+          git push origin HEAD:agent/fix-abbreviation-initials

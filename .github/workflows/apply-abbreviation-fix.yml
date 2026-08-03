@@ -2,16 +2,13 @@ name: Apply abbreviation parsing fix
 
 on:
   pull_request:
-    branches:
-      - master
-    types: [opened, synchronize, reopened, edited]
+    branches: [master]
 
 permissions:
   contents: write
 
 jobs:
   patch:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -65,7 +62,6 @@ jobs:
           if closing == -1:
               raise SystemExit('Could not locate SentenceTest class closing brace')
           test_path.write_text(tests[:closing] + insertion + tests[closing:], encoding='utf-8')
-
           Path('.github/workflows/apply-abbreviation-fix.yml').unlink()
           PY
 

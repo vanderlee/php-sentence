@@ -141,6 +141,23 @@ class SentenceTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::split
      */
+    public function testPreserveOriginalUnicode()
+    {
+        $text = 'Super Tortas is outstanding! I haven’t had as many tortas as I would like.';
+
+        $this->assertSame(
+            ['Super Tortas is outstanding!', ' I haven’t had as many tortas as I would like.'],
+            $this->object->split($text, Sentence::SPLIT_PRESERVE)
+        );
+        $this->assertSame(
+            ['Super Tortas is outstanding!', 'I haven’t had as many tortas as I would like.'],
+            $this->object->split($text, Sentence::SPLIT_PRESERVE | Sentence::SPLIT_TRIM)
+        );
+    }
+
+    /**
+     * @covers ::split
+     */
     public function testSplitWord()
     {
         $this->assertSame(['Hello'], $this->sentence()->split('Hello'));

@@ -3,7 +3,8 @@ name: Apply abbreviation parsing fix
 on:
   pull_request:
     branches:
-      - agent/modernize-test-matrix
+      - master
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: write
@@ -25,22 +26,16 @@ jobs:
 
           source_path = Path('src/Sentence.php')
           source = source_path.read_text(encoding='utf-8')
-          old = """        $last_is_capital = preg_match('#^\\p{Lu}#u', $last_word);
-        $last_is_abbreviation = mb_substr(Multibyte::trim($fragment), -1) === '.';
-
-        return $last_is_capital > 0
-            && $last_is_abbreviation > 0
-            && mb_strlen($last_word) <= 3;"""
-          new = """        $last_is_capital = preg_match('#^\\p{Lu}#u', $last_word);
-        $last_is_initial = preg_match('#^\\p{L}\\.$#u', $last_word);
-        $last_is_abbreviation = mb_substr(Multibyte::trim($fragment), -1) === '.';
-
-        return ($last_is_capital > 0 || $last_is_initial > 0)
-            && $last_is_abbreviation > 0
-            && mb_strlen($last_word) <= 3;"""
-          if source.count(old) != 1:
-              raise SystemExit('Expected abbreviation predicate exactly once')
-          source_path.write_text(source.replace(old, new), encoding='utf-8')
+          anchor = "$last_is_capital = preg_match('#^\\p{Lu}#u', $last_word);"
+          insertion = anchor + "\n        $last_is_initial = preg_match('#^\\p{L}\\.$#u', $last_word);"
+          if source.count(anchor) != 1:
+              raise SystemExit('Expected capitalization check exactly once')
+          source = source.replace(anchor, insertion)
+          old_return = 'return $last_is_capital > 0'
+          new_return = 'return ($last_is_capital > 0 || $last_is_initial > 0)'
+          if source.count(old_return) != 1:
+              raise SystemExit('Expected abbreviation return exactly once')
+          source_path.write_text(source.replace(old_return, new_return), encoding='utf-8')
 
           test_path = Path('tests/SentenceTest.php')
           tests = test_path.read_text(encoding='utf-8')

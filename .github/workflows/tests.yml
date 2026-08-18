@@ -13,6 +13,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.php == '8.6' }}
     strategy:
       fail-fast: false
       matrix:
@@ -28,6 +29,8 @@ jobs:
           - php: '8.4'
             composer: 'v2'
           - php: '8.5'
+            composer: 'v2'
+          - php: '8.6'
             composer: 'v2'
 
     name: PHP ${{ matrix.php }}

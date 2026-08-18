@@ -196,9 +196,20 @@ class Sentence
         });
 
         foreach ($filtered as $punctuation) {
+            $closes_dotted_initials = $punctuation === '..'
+                && !empty($merges)
+                && preg_match(
+                    '#(?:^|\\s)\\p{L}\\.$#u',
+                    Multibyte::trim($merges[count($merges) - 1])
+                ) > 0
+                && preg_match('#^\\p{L}$#u', Multibyte::trim($merge)) > 0;
+
             $merge .= $punctuation;
-            if (mb_strlen($punctuation) === 1
-                && in_array($punctuation, $this->terminals)) {
+            if ($closes_dotted_initials
+                || (
+                    mb_strlen($punctuation) === 1
+                    && in_array($punctuation, $this->terminals)
+                )) {
                 $merges[] = $merge;
                 $merge = '';
             } else {
@@ -260,7 +271,7 @@ class Sentence
     }
 
     /**
-     * Check if the last word of fragment starts with a Capital, ends in "." & has less than 3 characters.
+     * Check if the last word is a short capitalized abbreviation or initial ending in one period.
      *
      * @param $fragment
      *
@@ -276,9 +287,11 @@ class Sentence
         $last_is_capital = preg_match('#^\p{Lu}#u', $last_word);
         $last_is_initial = preg_match('#^\p{L}\.$#u', $last_word);
         $last_is_abbreviation = mb_substr(Multibyte::trim($fragment), -1) === '.';
+        $last_has_single_period = substr_count($last_word, '.') === 1;
 
         return ($last_is_capital > 0 || $last_is_initial > 0)
             && $last_is_abbreviation > 0
+            && $last_has_single_period
             && mb_strlen($last_word) <= 3;
     }
 

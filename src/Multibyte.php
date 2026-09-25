@@ -56,7 +56,8 @@ class Multibyte
      */
     public static function trim($string)
     {
-        return mb_ereg_replace('(^\s*)|(\s*$)', '', $string);
+        // Consume each whitespace run once, without backtracking or retrying its suffixes.
+        return mb_ereg_replace('\A\s++|(?<!\s)\s++\z', '', $string);
     }
 
     /**

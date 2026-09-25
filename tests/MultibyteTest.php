@@ -53,7 +53,16 @@ class MultibyteTest extends PHPUnit_Framework_TestCase
         if ($expected === null) {
             $expected = $subject;
         }
-        $this->assertSame($expected, Multibyte::trim($subject));
+        $encoding = mb_regex_encoding();
+        mb_regex_encoding('UTF-8');
+        try {
+            $actual = Multibyte::trim($subject);
+        } catch (\Exception $exception) {
+            mb_regex_encoding($encoding);
+            throw $exception;
+        }
+        mb_regex_encoding($encoding);
+        $this->assertSame($expected, $actual);
     }
 
     /**
